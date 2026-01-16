@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <title>Underpineapple</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Orbitron', 'sans-serif'],
+            },
+            colors: {
+              neon: {
+                blue: '#00f3ff',
+                pink: '#ff00ff',
+                purple: '#bc13fe',
+                green: '#0aff00',
+              },
+              dark: {
+                bg: '#0f172a',
+                card: '#1e293b',
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'fadeIn': 'fadeIn 0.5s ease-out',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-20px)' },
+              },
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #0f172a;
+        color: white;
+        overflow-x: hidden;
+      }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      }
+      .card-preserve-3d {
+        transform-style: preserve-3d;
+      }
+      .card-backface-hidden {
+        backface-visibility: hidden;
+      }
+      .rotate-y-180 {
+        transform: rotateY(180deg);
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
+    </style>
+    
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client?deps=react@18.2.0",
+        "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0",
+        "canvas-confetti": "https://esm.sh/canvas-confetti@1.9.2"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="error-container" style="color: red; padding: 20px; font-family: monospace; display: none;"></div>
+
+    <script>
+      window.onerror = function(message, source, lineno, colno, error) {
+        const container = document.getElementById('error-container');
+        if (container) {
+          container.style.display = 'block';
+          container.innerHTML += `<div>Error: ${message}</div><div>Source: ${source}:${lineno}</div><pre>${error ? error.stack : ''}</pre>`;
+        }
+      };
+    </script>
+
+    <script type="text/babel" data-type="module" data-presets="react">
+      import React, { useState, useEffect } from 'react';
+      import ReactDOM from 'react-dom/client';
+      import { 
+        Trophy, Users, Settings, Plus, X, Timer, VenetianMask, HelpCircle, 
+        Eye, EyeOff, User, Skull, Crown, AlertTriangle, Home, Trash2, RotateCcw
+      } from 'lucide-react';
+      import confetti from 'canvas-confetti';
+
+      // ==========================================
+      // CONSTANTS & ENUMS (JS)
+      // ==========================================
+      const Role = {
+        CIVILIAN: 'CIVILIAN',
+        UNDERCOVER: 'UNDERCOVER',
+        MR_WHITE: 'MR_WHITE'
+      };
+
+      const GamePhase = {
+        SETUP: 'SETUP',
+        PASS_PHONE: 'PASS_PHONE',
+        GAMEPLAY: 'GAMEPLAY',
+        GAME_OVER: 'GAME_OVER'
+      };
+
+      // Chiavi per il salvataggio locale
+      const STORAGE_KEY_PLAYERS = 'undercover_saved_players';
+      const STORAGE_KEY_SETTINGS = 'undercover_saved_settings';
+      const STORAGE_KEY_LEADERBOARD = 'undercover_neon_leaderboard';
+      const STORAGE_KEY_USED_WORDS = 'undercover_used_words_v1';
+
+      const WORDS_DB = [
+        // CIBO E BEVANDE
+        { civilian: "Sushi", undercover: "Sashimi" },
+        { civilian: "Pizza", undercover: "Focaccia" },
+        { civilian: "Gelato", undercover: "Sorbetto" },
+        { civilian: "Caffè", undercover: "Cappuccino" },
+        { civilian: "Tè", undercover: "Tisana" },
+        { civilian: "Birra", undercover: "Sidro" },
+        { civilian: "Vino", undercover: "Champagne" },
+        { civilian: "Pasta", undercover: "Riso" },
+        { civilian: "Ketchup", undercover: "Maionese" },
+        { civilian: "Nutella", undercover: "Cioccolato" },
+        { civilian: "Burro", undercover: "Margarina" },
+        { civilian: "Arancia", undercover: "Mandarino" },
+        { civilian: "Pesca", undercover: "Albicocca" },
+        { civilian: "Melone", undercover: "Anguria" },
+        { civilian: "Zucchina", undercover: "Cetriolo" },
+        { civilian: "Patatina", undercover: "Popcorn" },
+        { civilian: "Hamburger", undercover: "Sandwich" },
+        { civilian: "Cornetto", undercover: "Brioche" },
+        { civilian: "Mozzarella", undercover: "Burrata" },
+        { civilian: "Carbonara", undercover: "Amatriciana" },
+        // ANIMALI
+        { civilian: "Leone", undercover: "Tigre" },
+        { civilian: "Cane", undercover: "Lupo" },
+        { civilian: "Gatto", undercover: "Lince" },
+        { civilian: "Delfino", undercover: "Balena" },
+        { civilian: "Aquila", undercover: "Falco" },
+        { civilian: "Ape", undercover: "Vespa" },
+        { civilian: "Cavallo", undercover: "Asino" },
+        { civilian: "Coccodrillo", undercover: "Alligatore" },
+        { civilian: "Tartaruga", undercover: "Lumaca" },
+        { civilian: "Pinguino", undercover: "Gabbiano" },
+        { civilian: "Elefante", undercover: "Ippopotamo" },
+        { civilian: "Ragno", undercover: "Scorpione" },
+        { civilian: "Farfalla", undercover: "Libellula" },
+        { civilian: "Gufo", undercover: "Civetta" },
+        { civilian: "Ghepardo", undercover: "Leopardo" },
+        // TECNOLOGIA E MEDIA
+        { civilian: "Facebook", undercover: "Instagram" },
+        { civilian: "Whatsapp", undercover: "Telegram" },
+        { civilian: "Netflix", undercover: "Disney+" },
+        { civilian: "iPhone", undercover: "Samsung" },
+        { civilian: "PlayStation", undercover: "Xbox" },
+        { civilian: "Laptop", undercover: "Tablet" },
+        { civilian: "Cuffie", undercover: "Auricolari" },
+        { civilian: "Mouse", undercover: "Touchpad" },
+        { civilian: "Google", undercover: "Wikipedia" },
+        { civilian: "Tiktok", undercover: "Youtube" },
+        { civilian: "Email", undercover: "SMS" },
+        { civilian: "Spotify", undercover: "Radio" },
+        { civilian: "Wifi", undercover: "4G" },
+        // PERSONAGGI E FICTION
+        { civilian: "Harry Potter", undercover: "Frodo Baggins" },
+        { civilian: "Batman", undercover: "Iron Man" },
+        { civilian: "Superman", undercover: "Spiderman" },
+        { civilian: "Babbo Natale", undercover: "Befana" },
+        { civilian: "Vampiro", undercover: "Licantropo" },
+        { civilian: "Fantasma", undercover: "Zombie" },
+        { civilian: "Strega", undercover: "Fata" },
+        { civilian: "Alieno", undercover: "Astronauta" },
+        { civilian: "Re", undercover: "Imperatore" },
+        { civilian: "Pirata", undercover: "Bandito" },
+        { civilian: "Ninja", undercover: "Samurai" },
+        { civilian: "Sherlock Holmes", undercover: "Detective Conan" },
+        { civilian: "Joker", undercover: "Pennywise" },
+        // LUOGHI E NATURA
+        { civilian: "Mare", undercover: "Oceano" },
+        { civilian: "Lago", undercover: "Fiume" },
+        { civilian: "Montagna", undercover: "Collina" },
+        { civilian: "Deserto", undercover: "Spiaggia" },
+        { civilian: "Foresta", undercover: "Giungla" },
+        { civilian: "Sole", undercover: "Luna" },
+        { civilian: "Pioggia", undercover: "Neve" },
+        { civilian: "Uragano", undercover: "Tornado" },
+        { civilian: "Terremoto", undercover: "Vulcano" },
+        { civilian: "Hotel", undercover: "Ostello" },
+        { civilian: "Cinema", undercover: "Teatro" },
+        { civilian: "Museo", undercover: "Biblioteca" },
+        { civilian: "Scuola", undercover: "Università" },
+        { civilian: "Città", undercover: "Paese" },
+        { civilian: "Piscina", undercover: "Jacuzzi" },
+        // OGGETTI E CONCETTI
+        { civilian: "Chitarra", undercover: "Basso" },
+        { civilian: "Pianoforte", undercover: "Tastiera" },
+        { civilian: "Violino", undercover: "Violoncello" },
+        { civilian: "Penna", undercover: "Matita" },
+        { civilian: "Libro", undercover: "Rivista" },
+        { civilian: "Forchetta", undercover: "Cucchiaio" },
+        { civilian: "Bicchiere", undercover: "Tazza" },
+        { civilian: "Orologio", undercover: "Braccialetto" },
+        { civilian: "Collana", undercover: "Sciarpa" },
+        { civilian: "Scarpe", undercover: "Stivali" },
+        { civilian: "Maglietta", undercover: "Camicia" },
+        { civilian: "Treno", undercover: "Metro" },
+        { civilian: "Auto", undercover: "Moto" },
+        { civilian: "Elicottero", undercover: "Aereo" },
+        { civilian: "Bicicletta", undercover: "Monopattino" },
+        { civilian: "Specchio", undercover: "Vetro" },
+        { civilian: "Finestra", undercover: "Porta" },
+        { civilian: "Divano", undercover: "Poltrona" },
+        { civilian: "Letto", undercover: "Amaca" },
+        { civilian: "Amore", undercover: "Amicizia" },
+        { civilian: "Invidia", undercover: "Gelosia" },
+        { civilian: "Tristezza", undercover: "Malinconia" },
+        { civilian: "Sogno", undercover: "Incubo" },
+        { civilian: "Inferno", undercover: "Paradiso" }
+      ];
+
+      // ==========================================
+      // UTILS
+      // ==========================================
+      const shuffleArray = (array) => {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+      };
+
+      const getLeaderboard = () => {
+          const stored = localStorage.getItem(STORAGE_KEY_LEADERBOARD);
+          if (!stored) return [];
+          try {
+              const data = JSON.parse(stored);
+              return Object.values(data).sort((a, b) => b.wins - a.wins);
+          } catch (e) {
+              return [];
+          }
+      };
+
+      const updateLeaderboard = (winners, allPlayers) => {
+          const stored = localStorage.getItem(STORAGE_KEY_LEADERBOARD);
+          let data = stored ? JSON.parse(stored) : {};
+
+          allPlayers.forEach(player => {
+              if (!data[player]) {
+                  data[player] = { name: player, wins: 0, matches: 0 };
+              }
+              data[player].matches += 1;
+              if (winners.includes(player)) {
+                  data[player].wins += 1;
+              }
+          });
+
+          localStorage.setItem(STORAGE_KEY_LEADERBOARD, JSON.stringify(data));
+      };
+
+      const getNewWordPair = () => {
+        const storedUsed = localStorage.getItem(STORAGE_KEY_USED_WORDS);
+        const usedIndices = storedUsed ? JSON.parse(storedUsed) : [];
+        
+        const availableIndices = WORDS_DB.map((_, index) => index).filter(
+          index => !usedIndices.includes(index)
+        );
+
+        if (availableIndices.length === 0) {
+          return null;
+        }
+
+        const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        usedIndices.push(randomIndex);
+        localStorage.setItem(STORAGE_KEY_USED_WORDS, JSON.stringify(usedIndices));
+
+        return WORDS_DB[randomIndex];
+      };
+
+      const resetUsedWordsHistory = () => {
+        localStorage.removeItem(STORAGE_KEY_USED_WORDS);
+      };
+
+      // ==========================================
+      // COMPONENTS
+      // ==========================================
+
+      // --- Button ---
+      const Button = ({ 
+        children, 
+        variant = 'primary', 
+        fullWidth = false, 
+        className = '',
+        ...props 
+      }) => {
+        const baseStyles = "px-6 py-4 rounded-xl font-display font-bold text-sm tracking-wider uppercase transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg";
+        
+        const variants = {
+          primary: "bg-gradient-to-r from-neon-blue to-blue-600 text-white shadow-neon-blue/30 hover:shadow-neon-blue/50 border border-white/10",
+          secondary: "bg-white/10 text-white hover:bg-white/20 border border-white/10 backdrop-blur-md",
+          danger: "bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-red-500/30 hover:shadow-red-500/50",
+          ghost: "bg-transparent text-gray-400 hover:text-white"
+        };
+
+        return (
+          <button 
+            className={`${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+            {...props}
+          >
+            {children}
+          </button>
+        );
+      };
+
+      // --- SetupScreen ---
+      const SetupScreen = ({ onStartGame }) => {
+        // --- 1. CARICAMENTO GIOCATORI SALVATI ---
+        const [players, setPlayers] = useState(() => {
+            const saved = localStorage.getItem(STORAGE_KEY_PLAYERS);
+            return saved ? JSON.parse(saved) : [];
+        });
+
+        const [inputValue, setInputValue] = useState('');
+
+        // --- 2. CARICAMENTO IMPOSTAZIONI SALVATE ---
+        const [settings, setSettings] = useState(() => {
+            const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // MIGRATION: Convert old boolean mrWhiteEnabled to number mrWhiteCount if needed
+                if (typeof parsed.mrWhiteEnabled !== 'undefined') {
+                    parsed.mrWhiteCount = parsed.mrWhiteEnabled ? 1 : 0;
+                    delete parsed.mrWhiteEnabled;
+                }
+                // Ensure mrWhiteCount exists
+                if (typeof parsed.mrWhiteCount === 'undefined') parsed.mrWhiteCount = 1;
+                return parsed;
+            }
+            return {
+                mrWhiteCount: 1,
+                undercoverCount: 1,
+                timerEnabled: true,
+                timerDuration: 60
+            };
+        });
+
+        const [activeTab, setActiveTab] = useState('setup');
+        const [leaderboard, setLeaderboard] = useState([]);
+
+        useEffect(() => {
+          setLeaderboard(getLeaderboard());
+        }, [activeTab]);
+
+        // --- 3. SALVATAGGIO AUTOMATICO IMPOSTAZIONI ---
+        useEffect(() => {
+            localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+        }, [settings]);
+
+        // --- 4. SALVATAGGIO AUTOMATICO GIOCATORI ---
+        useEffect(() => {
+            localStorage.setItem(STORAGE_KEY_PLAYERS, JSON.stringify(players));
+        }, [players]);
+
+
+        const addPlayer = () => {
+          if (inputValue.trim() && !players.includes(inputValue.trim())) {
+            const newPlayers = [...players, inputValue.trim()];
+            setPlayers(newPlayers);
+            setInputValue('');
+          }
+        };
+
+        const removePlayer = (index) => {
+          const newPlayers = players.filter((_, i) => i !== index);
+          setPlayers(newPlayers);
+        };
+
+        // --- RESET FUNCTIONS ---
+        const handleClearPlayers = () => {
+          if (players.length === 0) return;
+          if (window.confirm("Sei sicuro di voler CANCELLARE tutti i giocatori dalla lista?")) {
+            setPlayers([]);
+          }
+        };
+
+        const handleClearLeaderboard = () => {
+          if (window.confirm("Sei sicuro di voler AZZERARE completamente la classifica? Questa azione non è reversibile.")) {
+            localStorage.removeItem(STORAGE_KEY_LEADERBOARD);
+            setLeaderboard([]);
+          }
+        };
+
+        const handleStart = () => {
+          const totalImpostors = settings.undercoverCount + settings.mrWhiteCount;
+          if (players.length < 3) return;
+          if (totalImpostors >= players.length) return; 
+          if (totalImpostors === 0) return; 
+
+          onStartGame(players, settings);
+        };
+
+        const formatTime = (seconds) => {
+          const m = Math.floor(seconds / 60);
+          const s = seconds % 60;
+          return `${m}:${s.toString().padStart(2, '0')}`;
+        };
+
+        const totalImpostors = settings.undercoverCount + settings.mrWhiteCount;
+        const isValidConfig = players.length >= 3 && totalImpostors > 0 && totalImpostors < players.length;
+
+        return (
+          <div className="flex flex-col h-full w-full max-w-5xl mx-auto relative z-10 p-4 md:p-8 bg-dark-bg/50 md:bg-dark-bg/0">
+            {/* Header */}
+            <div className="text-center mb-10 pt-4">
+              <h1 className="font-display text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-pink drop-shadow-[0_0_25px_rgba(0,243,255,0.4)] animate-pulse-slow break-all">
+                UNDERPINEAPPLE
+              </h1>
+              <p className="text-gray-400 text-xs md:text-sm tracking-[0.6em] mt-2 uppercase font-bold">Neon Edition</p>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex justify-center gap-6 mb-8">
+              <div className="bg-white/5 p-1.5 rounded-2xl inline-flex shadow-lg border border-white/5 backdrop-blur-sm">
+                <button 
+                  onClick={() => setActiveTab('setup')}
+                  className={`px-8 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 ${activeTab === 'setup' ? 'bg-gradient-to-r from-neon-blue/20 to-blue-500/20 text-white shadow-lg border border-neon-blue/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                >
+                  GIOCA
+                </button>
+                <button 
+                  onClick={() => setActiveTab('leaderboard')}
+                  className={`px-8 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 ${activeTab === 'leaderboard' ? 'bg-gradient-to-r from-neon-pink/20 to-purple-500/20 text-white shadow-lg border border-neon-pink/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                >
+                  CLASSIFICA
+                </button>
+              </div>
+            </div>
+
+            {activeTab === 'setup' ? (
+              <div className="flex-1 flex flex-col min-h-0 pb-28 md:pb-0">
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                  
+                  {/* Player Input Column */}
+                  <div className="glass-panel p-6 md:p-8 rounded-[2rem] flex flex-col h-full shadow-2xl border border-white/10">
+                    <div className="flex justify-between items-center mb-5">
+                      <h3 className="text-sm font-bold text-gray-400 uppercase flex items-center gap-2 tracking-wider">
+                        <Users size={18} className="text-neon-blue" /> Giocatori ({players.length})
+                      </h3>
+                      {players.length > 0 && (
+                        <button 
+                          onClick={handleClearPlayers}
+                          className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-colors flex items-center gap-2 text-xs uppercase font-bold tracking-wider"
+                          title="Cancella tutti i giocatori"
+                        >
+                          <Trash2 size={16} /> Reset
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="flex gap-3 mb-8">
+                      <input 
+                        type="text" 
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
+                        placeholder="Nome giocatore..."
+                        className="flex-1 bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all text-lg shadow-inner"
+                      />
+                      <button 
+                        onClick={addPlayer} 
+                        className="bg-gradient-to-r from-neon-blue to-blue-600 text-white rounded-2xl w-16 flex items-center justify-center shadow-lg shadow-neon-blue/20 hover:shadow-neon-blue/40 border border-white/10 transition-all active:scale-95 hover:scale-105 group"
+                        aria-label="Aggiungi"
+                      >
+                        <Plus size={32} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                       <div className="flex flex-wrap gap-3 content-start">
+                          {players.map((p, i) => (
+                            <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 pl-5 pr-2 py-3 rounded-2xl animate-fadeIn group hover:border-neon-blue/30 hover:bg-neon-blue/5 transition-all shadow-md">
+                              <span className="font-bold text-lg text-white group-hover:text-neon-blue transition-colors">{p}</span>
+                              <button 
+                                  onClick={() => removePlayer(i)} 
+                                  className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 transition-colors rounded-xl p-2"
+                              >
+                                <X size={18} />
+                              </button>
+                            </div>
+                          ))}
+                          {players.length === 0 && (
+                              <div className="w-full h-48 flex flex-col items-center justify-center text-gray-500 border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
+                                  <Users size={48} className="mb-4 opacity-30 text-neon-blue" />
+                                  <p className="text-base font-medium">Nessun giocatore</p>
+                                  <p className="text-sm opacity-60">Aggiungi almeno 3 giocatori</p>
+                              </div>
+                          )}
+                       </div>
+                    </div>
+                  </div>
+
+                  {/* Settings Group Column */}
+                  <div className="space-y-6 flex flex-col">
+                    
+                    {/* Roles Settings */}
+                    <div className="glass-panel p-6 md:p-8 rounded-[2rem] space-y-8 flex-1 border border-white/10 shadow-2xl">
+                      <h3 className="text-sm font-bold text-gray-400 uppercase mb-2 flex items-center gap-2 tracking-wider">
+                        <Settings size={18} className="text-neon-pink" /> Ruoli
+                      </h3>
+
+                      {/* Mister White Counter */}
+                      <div className="flex items-center justify-between p-2 hover:bg-white/5 rounded-2xl transition-colors">
+                        <div className="flex items-center gap-5">
+                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.mrWhiteCount > 0 ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-110' : 'bg-white/5 text-gray-500'}`}>
+                            <HelpCircle size={28} />
+                          </div>
+                          <div>
+                            <h3 className={`font-bold text-xl transition-colors ${settings.mrWhiteCount > 0 ? 'text-white' : 'text-gray-500'}`}>Mister White</h3>
+                            <p className="text-sm text-gray-500 mt-1">Non conosce la parola</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 bg-black/40 rounded-2xl p-2 border border-white/5">
+                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white disabled:opacity-30 transition-colors" 
+                            disabled={settings.mrWhiteCount === 0}
+                            onClick={() => setSettings(s => ({...s, mrWhiteCount: Math.max(0, s.mrWhiteCount - 1)}))}>-</button>
+                           <span className="font-display font-bold w-8 text-center text-white text-2xl">{settings.mrWhiteCount}</span>
+                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white transition-colors"
+                            onClick={() => setSettings(s => ({...s, mrWhiteCount: s.mrWhiteCount + 1}))}>+</button>
+                        </div>
+                      </div>
+
+                      {/* Undercover Counter */}
+                      <div className="flex items-center justify-between p-2 hover:bg-white/5 rounded-2xl transition-colors">
+                        <div className="flex items-center gap-5">
+                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.undercoverCount > 0 ? 'bg-neon-pink text-black shadow-[0_0_20px_rgba(255,0,255,0.3)] scale-110' : 'bg-white/5 text-gray-500'}`}>
+                            <VenetianMask size={28} />
+                          </div>
+                          <div>
+                            <h3 className={`font-bold text-xl transition-colors ${settings.undercoverCount > 0 ? 'text-white' : 'text-gray-500'}`}>Infiltrati</h3>
+                            <p className="text-sm text-gray-500 mt-1">Hanno parola diversa</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 bg-black/40 rounded-2xl p-2 border border-white/5">
+                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white disabled:opacity-30 transition-colors" 
+                            disabled={settings.undercoverCount === 0}
+                            onClick={() => setSettings(s => ({...s, undercoverCount: Math.max(0, s.undercoverCount - 1)}))}>-</button>
+                           <span className="font-display font-bold w-8 text-center text-neon-pink text-2xl">{settings.undercoverCount}</span>
+                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white transition-colors"
+                            onClick={() => setSettings(s => ({...s, undercoverCount: s.undercoverCount + 1}))}>+</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Timer Settings */}
+                    <div className="glass-panel p-6 md:p-8 rounded-[2rem] space-y-6 flex-1 border border-white/10 shadow-2xl">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.timerEnabled ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(10,255,0,0.3)]' : 'bg-white/5 text-gray-500'}`}>
+                            <Timer size={28} />
+                          </div>
+                          <div>
+                            <h3 className={`font-bold text-xl transition-colors ${settings.timerEnabled ? 'text-white' : 'text-gray-500'}`}>Timer</h3>
+                            <p className="text-sm text-gray-500 mt-1">Tempo per discutere</p>
+                          </div>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" checked={settings.timerEnabled} onChange={e => setSettings({...settings, timerEnabled: e.target.checked})} className="sr-only peer" />
+                          <div className="w-16 h-9 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all peer-checked:bg-neon-green peer-checked:after:bg-white"></div>
+                        </label>
+                      </div>
+
+                      {settings.timerEnabled && (
+                        <div className="flex items-center justify-between pl-2 animate-fadeIn bg-white/5 p-4 rounded-2xl border border-white/5">
+                           <span className="text-base font-bold text-gray-300">Durata timer</span>
+                           <div className="flex items-center gap-4">
+                             <button className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-lg hover:bg-white/20 text-white transition-colors" 
+                              onClick={() => setSettings(s => ({...s, timerDuration: Math.max(30, s.timerDuration - 30)}))}>-</button>
+                             <span className="font-display font-bold w-20 text-center text-neon-green text-xl tracking-wider">{formatTime(settings.timerDuration)}</span>
+                             <button className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-lg hover:bg-white/20 text-white transition-colors"
+                              onClick={() => setSettings(s => ({...s, timerDuration: s.timerDuration + 30}))}>+</button>
+                           </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {!isValidConfig && players.length >= 3 && (
+                  <div className="mt-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-center backdrop-blur-md">
+                    <p className="text-red-400 font-bold text-lg">
+                      ⚠️ Configurazione non valida.
+                      {totalImpostors === 0 ? " Aggiungi almeno un nemico." : " Troppi nemici per il numero di giocatori."}
+                    </p>
+                  </div>
+                )}
+
+              </div>
+            ) : (
+              <div className="flex-1 min-h-0 flex flex-col pb-24">
+                <div className="glass-panel rounded-3xl overflow-hidden border border-white/10 flex-1 overflow-y-auto">
+                  <table className="w-full text-left">
+                    <thead className="bg-white/5 text-gray-400 text-xs uppercase tracking-widest sticky top-0 bg-dark-bg/90 backdrop-blur-md z-10">
+                      <tr>
+                        <th className="p-6 md:p-8">Rank</th>
+                        <th className="p-6 md:p-8">Player</th>
+                        <th className="p-6 md:p-8 text-right">Vittorie</th>
+                        <th className="p-6 md:p-8 text-right hidden md:table-cell">Partite</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {leaderboard.map((entry, idx) => (
+                        <tr key={entry.name} className="hover:bg-white/5 transition-colors group">
+                          <td className="p-6 md:p-8 font-display font-bold text-gray-500 group-hover:text-white transition-colors text-lg">
+                            {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
+                          </td>
+                          <td className="p-6 md:p-8 font-bold text-xl md:text-2xl">{entry.name}</td>
+                          <td className="p-6 md:p-8 text-right font-display text-neon-blue text-2xl shadow-neon-blue drop-shadow-sm">{entry.wins}</td>
+                          <td className="p-6 md:p-8 text-right font-display text-gray-500 hidden md:table-cell text-xl">{entry.matches}</td>
+                        </tr>
+                      ))}
+                      {leaderboard.length === 0 && (
+                        <tr><td colSpan={4} className="p-16 text-center text-gray-500 italic text-lg">Nessuna partita registrata</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {/* Reset Leaderboard Button */}
+                {leaderboard.length > 0 && (
+                   <div className="mt-6 flex justify-center">
+                     <button 
+                       onClick={handleClearLeaderboard}
+                       className="flex items-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 hover:text-red-200 transition-all text-sm uppercase font-bold tracking-wider"
+                     >
+                       <RotateCcw size={18} /> Azzera Classifica
+                     </button>
+                   </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'setup' && (
+              <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-dark-bg via-dark-bg to-transparent z-30 pointer-events-none flex justify-center">
+                <div className="w-full max-w-2xl pointer-events-auto">
+                  <Button fullWidth onClick={handleStart} disabled={!isValidConfig} className="py-5 text-xl tracking-[0.2em] shadow-[0_0_40px_rgba(0,243,255,0.3)] hover:shadow-[0_0_60px_rgba(0,243,255,0.5)] border-t border-white/20">
+                    INIZIA LA PARTITA
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // --- PassScreen ---
+      const PassScreen = ({ player, onNext }) => {
+        const [isFlipped, setIsFlipped] = useState(false);
+        const [isTransitioning, setIsTransitioning] = useState(false);
+
+        const handleCardClick = () => {
+          if (isTransitioning) return;
+
+          if (!isFlipped) {
+            setIsFlipped(true);
+          } else {
+            setIsFlipped(false);
+            setIsTransitioning(true);
+            setTimeout(() => {
+              setIsTransitioning(false);
+              onNext();
+            }, 700); 
+          }
+        };
+
+        const getRoleIcon = () => {
+          switch (player.role) {
+            case Role.MR_WHITE: return <HelpCircle size={80} className="text-white" />;
+            case Role.UNDERCOVER: return <VenetianMask size={80} className="text-neon-pink" />;
+            default: return <User size={80} className="text-neon-blue" />;
+          }
+        };
+
+        const getRoleName = () => {
+          switch (player.role) {
+            case Role.MR_WHITE: return "Mister White";
+            case Role.UNDERCOVER: return "Infiltrato";
+            default: return "Cittadino";
+          }
+        };
+
+        return (
+          <div className="h-full w-full flex flex-col items-center justify-center p-6 relative">
+            <div className="text-center mb-10 animate-float">
+              <h2 className="text-gray-400 uppercase tracking-[0.3em] text-sm md:text-base mb-3">Turno di</h2>
+              <h1 className="font-display text-5xl md:text-6xl font-black text-white transition-opacity duration-300 drop-shadow-xl">
+                 {player.name}
+              </h1>
+            </div>
+
+            <div 
+              className="w-full max-w-[320px] md:max-w-[420px] aspect-[3/4] cursor-pointer group perspective-1000"
+              onClick={handleCardClick}
+            >
+              <div className={`relative w-full h-full duration-700 transition-all card-preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
+                {/* FRONT */}
+                <div className="absolute inset-0 w-full h-full card-backface-hidden">
+                  <div className="w-full h-full glass-panel rounded-[2.5rem] border-2 border-neon-blue/30 flex flex-col items-center justify-center p-10 shadow-[0_0_30px_rgba(0,243,255,0.1)] group-hover:shadow-[0_0_60px_rgba(0,243,255,0.3)] transition-shadow bg-dark-card/50">
+                    <div className="w-32 h-32 rounded-full bg-neon-blue/10 flex items-center justify-center mb-8 animate-pulse-slow ring-1 ring-neon-blue/30">
+                      <Eye size={64} className="text-neon-blue" />
+                    </div>
+                    <h3 className="font-display text-3xl font-bold text-center mb-4 tracking-wider">TOCCA PER<br/>RIVELARE</h3>
+                    <p className="text-gray-400 text-center text-sm md:text-base max-w-[80%]">Assicurati che nessun altro stia guardando lo schermo</p>
+                  </div>
+                </div>
+
+                {/* BACK */}
+                <div className="absolute inset-0 w-full h-full card-backface-hidden rotate-y-180">
+                  <div className={`w-full h-full glass-panel rounded-[2.5rem] border-2 flex flex-col items-center justify-center p-10 shadow-2xl bg-dark-card/80 backdrop-blur-xl ${
+                    player.role === Role.CIVILIAN ? 'border-neon-blue/50 shadow-neon-blue/20' : 
+                    player.role === Role.UNDERCOVER ? 'border-neon-pink/50 shadow-neon-pink/20' : 
+                    'border-white/50 shadow-white/20'
+                  }`}>
+                    <div className="mb-8 transform scale-110">
+                      {getRoleIcon()}
+                    </div>
+                    
+                    <h3 className="font-display text-2xl font-bold mb-10 opacity-80 tracking-[0.2em] uppercase">
+                      {getRoleName()}
+                    </h3>
+
+                    <div className="w-full bg-black/40 rounded-2xl p-8 text-center border border-white/5 mb-10 shadow-inner">
+                      <p className="text-xs text-gray-500 uppercase mb-3 tracking-wider">La tua parola segreta</p>
+                      <p className="font-display text-4xl md:text-5xl font-black tracking-wider break-words text-white drop-shadow-lg">
+                        {player.role === Role.MR_WHITE ? "???" : player.word}
+                      </p>
+                    </div>
+
+                    <div className="mt-auto flex flex-col items-center text-gray-400">
+                      <EyeOff size={28} className="mb-2" />
+                      <span className="text-xs uppercase tracking-[0.2em]">Tocca per nascondere</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // --- GameScreen ---
+      const GameScreen = ({ players, onEliminate, gameStatus, setGameStatus, settings }) => {
+        const [timeLeft, setTimeLeft] = useState(settings.timerDuration);
+        const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+        useEffect(() => {
+          let interval;
+          if (settings.timerEnabled && gameStatus === 'playing' && timeLeft > 0) {
+            interval = setInterval(() => {
+              setTimeLeft((prev) => prev - 1);
+            }, 1000);
+          }
+          return () => clearInterval(interval);
+        }, [gameStatus, timeLeft, settings.timerEnabled]);
+
+        const handlePlayerClick = (id) => {
+          if (gameStatus === 'voting') {
+            const p = players.find(pl => pl.id === id);
+            if (p && p.isAlive) {
+              setSelectedPlayer(id);
+            }
+          }
+        };
+
+        const confirmElimination = () => {
+          if (selectedPlayer) {
+            onEliminate(selectedPlayer);
+            setSelectedPlayer(null);
+          }
+        };
+
+        const formatTime = (seconds) => {
+          const m = Math.floor(seconds / 60);
+          const s = seconds % 60;
+          return `${m}:${s.toString().padStart(2, '0')}`;
+        };
+
+        return (
+          <div className="h-full w-full flex flex-col p-6">
+            {/* Top Bar */}
+            <div className="flex justify-between items-center mb-8 sticky top-0 z-20 bg-dark-bg/80 backdrop-blur-sm py-4">
+              {settings.timerEnabled ? (
+                <div className="px-6 py-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md shadow-lg">
+                  <span className={`font-display font-bold text-3xl ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                    {gameStatus === 'playing' ? formatTime(timeLeft) : 'VOTAZIONE'}
+                  </span>
+                </div>
+              ) : (
+                 <div className="px-6 py-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md shadow-lg">
+                   <span className="font-display font-bold text-lg text-neon-blue tracking-wider">
+                      {gameStatus === 'playing' ? 'IN CORSO' : 'VOTAZIONE'}
+                   </span>
+                 </div>
+              )}
+              
+              <div className="text-sm font-medium text-right text-gray-400 bg-black/20 px-4 py-2 rounded-lg">
+                <p className="mb-1"><span className="text-green-400">●</span> VIVI: {players.filter(p => p.isAlive).length}</p>
+                <p><span className="text-red-500">●</span> ELIMINATI: {players.filter(p => !p.isAlive).length}</p>
+              </div>
+            </div>
+
+            {/* Grid */}
+            <div className="flex-1 overflow-y-auto pb-32">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 lg:gap-8 content-start">
+                {players.map((p) => (
+                  <div 
+                    key={p.id}
+                    onClick={() => handlePlayerClick(p.id)}
+                    className={`
+                      relative aspect-square rounded-3xl p-4 flex flex-col items-center justify-center text-center transition-all duration-300 border-2 group
+                      ${!p.isAlive ? 'opacity-40 grayscale border-gray-800 bg-black/50' : ''}
+                      ${gameStatus === 'voting' && p.isAlive ? 'cursor-pointer hover:scale-[1.02] active:scale-95 animate-pulse-slow hover:shadow-neon-blue/20 hover:border-neon-blue/50' : ''}
+                      ${selectedPlayer === p.id ? 'border-red-500 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.3)] scale-[0.98]' : 'border-white/5 bg-white/5 hover:bg-white/10'}
+                    `}
+                  >
+                    {/* Starter Badge */}
+                    {p.isStarter && (
+                      <div className="absolute top-3 right-3 text-yellow-400 drop-shadow-md" title="Primo giocatore">
+                        <Crown size={20} fill="currentColor" />
+                      </div>
+                    )}
+
+                    {/* Avatar */}
+                    <div className={`
+                      w-16 h-16 md:w-20 md:h-20 rounded-full mb-4 flex items-center justify-center text-3xl md:text-4xl font-bold shadow-xl ring-4 ring-black/20
+                      ${!p.isAlive ? 'bg-gray-800 text-gray-500' : 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'}
+                    `}>
+                      {!p.isAlive ? <Skull size={28} /> : p.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    {/* Name */}
+                    <h3 className={`
+                      font-display font-black leading-tight break-words w-full px-2
+                      ${p.name.length > 8 ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'}
+                      ${p.isAlive ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 group-hover:from-neon-blue group-hover:to-white transition-all' : 'text-gray-500 line-through decoration-red-500 decoration-2'}
+                    `}>
+                      {p.name}
+                    </h3>
+
+                    {/* Status */}
+                    {!p.isAlive && (
+                      <span className="text-xs md:text-sm text-red-500 font-bold uppercase tracking-widest mt-2 border border-red-500/30 px-2 py-0.5 rounded-full">
+                        ELIMINATO
+                      </span>
+                    )}
+
+                    {/* Selection Indicator */}
+                    {selectedPlayer === p.id && (
+                      <div className="absolute inset-0 rounded-3xl border-4 border-red-500 animate-pulse pointer-events-none"></div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Bar */}
+            <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-dark-bg via-dark-bg to-transparent z-30">
+              <div className="max-w-2xl mx-auto">
+                {gameStatus === 'playing' ? (
+                  <Button 
+                    fullWidth 
+                    variant="danger" 
+                    className="text-lg py-5 shadow-2xl"
+                    onClick={() => {
+                      setGameStatus('voting');
+                      setTimeLeft(0);
+                    }}
+                  >
+                    AVVIA VOTAZIONE
+                  </Button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-4 justify-center backdrop-blur-md">
+                      <AlertTriangle className="text-red-500 flex-shrink-0 w-6 h-6" />
+                      <p className="text-base md:text-lg text-red-100 font-medium">
+                        {selectedPlayer 
+                          ? <span>Vuoi eliminare <span className="font-bold text-white underline decoration-red-500">{players.find(p => p.id === selectedPlayer)?.name}</span>?</span>
+                          : "Seleziona un giocatore da eliminare"}
+                      </p>
+                    </div>
+                    <Button 
+                      fullWidth 
+                      variant="danger" 
+                      className="text-lg py-5 shadow-2xl"
+                      disabled={!selectedPlayer} 
+                      onClick={confirmElimination}
+                    >
+                      ELIMINA GIOCATORE
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // --- App ---
+      const App = () => {
+        const [phase, setPhase] = useState(GamePhase.SETUP);
+        const [players, setPlayers] = useState([]);
+        const [turnIndex, setTurnIndex] = useState(0);
+        const [civilianWord, setCivilianWord] = useState('');
+        const [gameStatus, setGameStatus] = useState('playing');
+        const [winners, setWinners] = useState(null);
+        
+        const [currentSettings, setCurrentSettings] = useState({
+          mrWhiteCount: 1,
+          undercoverCount: 1,
+          timerEnabled: true,
+          timerDuration: 60
+        });
+
+        const startGame = (names, settings) => {
+          setCurrentSettings(settings);
+
+          let pair = getNewWordPair();
+
+          if (!pair) {
+            const shouldReset = window.confirm(
+              "🎉 Complimenti! Hai giocato tutte le parole disponibili nel database!\n\nVuoi resettare la memoria e ricominciare da capo con le stesse parole?"
+            );
+
+            if (shouldReset) {
+              resetUsedWordsHistory();
+              pair = getNewWordPair();
+            } else {
+              return; 
+            }
+          }
+
+          if (!pair) return;
+
+          setCivilianWord(pair.civilian);
+
+          let roles = [];
+          // Add Mr. Whites based on count
+          for (let i = 0; i < settings.mrWhiteCount; i++) roles.push(Role.MR_WHITE);
+          // Add Undercovers
+          for (let i = 0; i < settings.undercoverCount; i++) roles.push(Role.UNDERCOVER);
+          
+          while (roles.length < names.length) roles.push(Role.CIVILIAN);
+          
+          roles = shuffleArray(roles);
+
+          const newPlayers = names.map((name, i) => ({
+            id: `p-${i}-${Date.now()}`,
+            name: name,
+            role: roles[i],
+            word: roles[i] === Role.CIVILIAN ? pair.civilian : (roles[i] === Role.UNDERCOVER ? pair.undercover : undefined),
+            isAlive: true,
+            isStarter: false
+          }));
+
+          const starterIndex = Math.floor(Math.random() * newPlayers.length);
+          newPlayers[starterIndex].isStarter = true;
+
+          const shuffledForTurn = shuffleArray([...newPlayers]);
+
+          setPlayers(shuffledForTurn);
+          setTurnIndex(0);
+          setGameStatus('playing');
+          setPhase(GamePhase.PASS_PHONE);
+        };
+
+        const handleNextPlayer = () => {
+          if (turnIndex < players.length - 1) {
+            setTurnIndex(turnIndex + 1);
+          } else {
+            setPhase(GamePhase.GAMEPLAY);
+          }
+        };
+
+        const handleEliminate = (playerId) => {
+          const eliminatedPlayer = players.find(p => p.id === playerId);
+          if (!eliminatedPlayer) return;
+
+          const updatedPlayers = players.map(p => 
+            p.id === playerId ? { ...p, isAlive: false } : p
+          );
+          setPlayers(updatedPlayers);
+
+          if (eliminatedPlayer.role === Role.MR_WHITE) {
+            setTimeout(() => {
+              const guess = prompt(`Mister White (${eliminatedPlayer.name}) è stato scoperto! Ha una chance per vincere.\n\nQual è la parola segreta dei Civili?`);
+              
+              if (guess && guess.toLowerCase().trim() === civilianWord.toLowerCase().trim()) {
+                 handleGameOver('Mr. White', [eliminatedPlayer.name]);
+                 return;
+              } else {
+                 alert("Sbagliato! La parola era: " + civilianWord);
+                 checkWinCondition(updatedPlayers);
+              }
+            }, 100);
+          } else {
+            checkWinCondition(updatedPlayers);
+          }
+          
+          setGameStatus('playing');
+        };
+
+        const checkWinCondition = (currentPlayers) => {
+          const alive = currentPlayers.filter(p => p.isAlive);
+          const civilians = alive.filter(p => p.role === Role.CIVILIAN);
+          const impostors = alive.filter(p => p.role !== Role.CIVILIAN);
+
+          if (impostors.length >= civilians.length) {
+            const impostorNames = players.filter(p => p.role !== Role.CIVILIAN).map(p => p.name);
+            handleGameOver('Impostori', impostorNames);
+            return;
+          }
+
+          if (impostors.length === 0) {
+            const civilianNames = players.filter(p => p.role === Role.CIVILIAN).map(p => p.name);
+            handleGameOver('Cittadini', civilianNames);
+            return;
+          }
+        };
+
+        const triggerConfetti = () => {
+          const duration = 3000;
+          const end = Date.now() + duration;
+
+          const frame = () => {
+            confetti({
+              particleCount: 2,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0 },
+              colors: ['#00f3ff', '#ff00ff', '#ffffff']
+            });
+            confetti({
+              particleCount: 2,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1 },
+              colors: ['#00f3ff', '#ff00ff', '#ffffff']
+            });
+
+            if (Date.now() < end) {
+              requestAnimationFrame(frame);
+            }
+          };
+          frame();
+        };
+
+        const handleGameOver = (winningTeam, winnerNames) => {
+          setPhase(GamePhase.GAME_OVER);
+          triggerConfetti();
+          
+          let icon = <Trophy size={80} className="text-yellow-400" />;
+          if (winningTeam === 'Impostori') icon = <div className="text-7xl">👺</div>;
+          
+          setWinners({ team: winningTeam, icon });
+          updateLeaderboard(winnerNames, players.map(p => p.name));
+        };
+
+        return (
+          <div className="w-full min-h-screen bg-dark-bg text-white font-sans overflow-x-hidden flex flex-col items-center">
+            <div className="fixed top-[-20%] left-[-20%] w-[50vw] h-[50vw] bg-neon-blue/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow z-0"></div>
+            <div className="fixed bottom-[-20%] right-[-20%] w-[50vw] h-[50vw] bg-neon-pink/10 rounded-full blur-[100px] pointer-events-none animate-pulse-slow z-0" style={{ animationDelay: '1.5s' }}></div>
+
+            <div className="relative z-10 w-full h-full flex-1 flex flex-col max-w-7xl mx-auto">
+              
+              {phase === GamePhase.SETUP && (
+                <div className="flex-1 flex items-center justify-center p-4">
+                   <SetupScreen onStartGame={startGame} />
+                </div>
+              )}
+
+              {phase === GamePhase.PASS_PHONE && (
+                 <div className="flex-1 flex items-center justify-center p-4">
+                   <PassScreen 
+                    player={players[turnIndex]} 
+                    onNext={handleNextPlayer} 
+                    civilianWord={civilianWord}
+                  />
+                 </div>
+              )}
+
+              {phase === GamePhase.GAMEPLAY && (
+                <GameScreen 
+                  players={players} 
+                  onEliminate={handleEliminate} 
+                  gameStatus={gameStatus} 
+                  setGameStatus={setGameStatus} 
+                  settings={currentSettings} 
+                />
+              )}
+
+              {phase === GamePhase.GAME_OVER && winners && (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-fadeIn max-w-lg mx-auto">
+                  <div className="mb-8 animate-bounce drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">
+                    {winners.icon}
+                  </div>
+                  <h2 className="text-gray-400 uppercase tracking-[0.3em] text-lg mb-4">Vittoria</h2>
+                  <h1 className="font-display text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-neon-pink mb-12 drop-shadow-2xl">
+                    {winners.team}
+                  </h1>
+                  
+                  <div className="glass-panel p-8 rounded-3xl w-full mb-12 transform hover:scale-105 transition-transform duration-300">
+                    <h3 className="text-sm text-gray-400 mb-4 uppercase tracking-wider">Parola Segreta</h3>
+                    <p className="text-4xl font-bold text-white tracking-wide">{civilianWord}</p>
+                  </div>
+
+                  <div className="space-y-4 w-full">
+                    <Button fullWidth onClick={() => setPhase(GamePhase.SETUP)}>
+                      <Home className="inline-block mr-2" size={24} />
+                      Torna al Menu
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
