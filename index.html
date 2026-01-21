@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <title>Underpineapple</title>
+    <title>UnderSucate2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -143,112 +143,177 @@
       const STORAGE_KEY_USED_WORDS = 'undercover_used_words_v1';
 
       const WORDS_DB = [
-        // CIBO E BEVANDE
-        { civilian: "Sushi", undercover: "Sashimi" },
-        { civilian: "Pizza", undercover: "Focaccia" },
-        { civilian: "Gelato", undercover: "Sorbetto" },
-        { civilian: "Caffè", undercover: "Cappuccino" },
-        { civilian: "Tè", undercover: "Tisana" },
-        { civilian: "Birra", undercover: "Sidro" },
-        { civilian: "Vino", undercover: "Champagne" },
-        { civilian: "Pasta", undercover: "Riso" },
-        { civilian: "Ketchup", undercover: "Maionese" },
-        { civilian: "Nutella", undercover: "Cioccolato" },
-        { civilian: "Burro", undercover: "Margarina" },
-        { civilian: "Arancia", undercover: "Mandarino" },
-        { civilian: "Pesca", undercover: "Albicocca" },
-        { civilian: "Melone", undercover: "Anguria" },
-        { civilian: "Zucchina", undercover: "Cetriolo" },
-        { civilian: "Patatina", undercover: "Popcorn" },
-        { civilian: "Hamburger", undercover: "Sandwich" },
-        { civilian: "Cornetto", undercover: "Brioche" },
-        { civilian: "Mozzarella", undercover: "Burrata" },
-        { civilian: "Carbonara", undercover: "Amatriciana" },
-        // ANIMALI
-        { civilian: "Leone", undercover: "Tigre" },
-        { civilian: "Cane", undercover: "Lupo" },
-        { civilian: "Gatto", undercover: "Lince" },
-        { civilian: "Delfino", undercover: "Balena" },
-        { civilian: "Aquila", undercover: "Falco" },
-        { civilian: "Ape", undercover: "Vespa" },
-        { civilian: "Cavallo", undercover: "Asino" },
-        { civilian: "Coccodrillo", undercover: "Alligatore" },
-        { civilian: "Tartaruga", undercover: "Lumaca" },
-        { civilian: "Pinguino", undercover: "Gabbiano" },
-        { civilian: "Elefante", undercover: "Ippopotamo" },
-        { civilian: "Ragno", undercover: "Scorpione" },
-        { civilian: "Farfalla", undercover: "Libellula" },
-        { civilian: "Gufo", undercover: "Civetta" },
-        { civilian: "Ghepardo", undercover: "Leopardo" },
-        // TECNOLOGIA E MEDIA
-        { civilian: "Facebook", undercover: "Instagram" },
-        { civilian: "Whatsapp", undercover: "Telegram" },
-        { civilian: "Netflix", undercover: "Disney+" },
-        { civilian: "iPhone", undercover: "Samsung" },
-        { civilian: "PlayStation", undercover: "Xbox" },
-        { civilian: "Laptop", undercover: "Tablet" },
-        { civilian: "Cuffie", undercover: "Auricolari" },
-        { civilian: "Mouse", undercover: "Touchpad" },
-        { civilian: "Google", undercover: "Wikipedia" },
-        { civilian: "Tiktok", undercover: "Youtube" },
-        { civilian: "Email", undercover: "SMS" },
-        { civilian: "Spotify", undercover: "Radio" },
-        { civilian: "Wifi", undercover: "4G" },
-        // PERSONAGGI E FICTION
-        { civilian: "Harry Potter", undercover: "Frodo Baggins" },
-        { civilian: "Batman", undercover: "Iron Man" },
-        { civilian: "Superman", undercover: "Spiderman" },
-        { civilian: "Babbo Natale", undercover: "Befana" },
-        { civilian: "Vampiro", undercover: "Licantropo" },
-        { civilian: "Fantasma", undercover: "Zombie" },
-        { civilian: "Strega", undercover: "Fata" },
-        { civilian: "Alieno", undercover: "Astronauta" },
-        { civilian: "Re", undercover: "Imperatore" },
-        { civilian: "Pirata", undercover: "Bandito" },
-        { civilian: "Ninja", undercover: "Samurai" },
-        { civilian: "Sherlock Holmes", undercover: "Detective Conan" },
-        { civilian: "Joker", undercover: "Pennywise" },
-        // LUOGHI E NATURA
-        { civilian: "Mare", undercover: "Oceano" },
-        { civilian: "Lago", undercover: "Fiume" },
-        { civilian: "Montagna", undercover: "Collina" },
-        { civilian: "Deserto", undercover: "Spiaggia" },
-        { civilian: "Foresta", undercover: "Giungla" },
-        { civilian: "Sole", undercover: "Luna" },
-        { civilian: "Pioggia", undercover: "Neve" },
-        { civilian: "Uragano", undercover: "Tornado" },
-        { civilian: "Terremoto", undercover: "Vulcano" },
-        { civilian: "Hotel", undercover: "Ostello" },
-        { civilian: "Cinema", undercover: "Teatro" },
-        { civilian: "Museo", undercover: "Biblioteca" },
-        { civilian: "Scuola", undercover: "Università" },
-        { civilian: "Città", undercover: "Paese" },
-        { civilian: "Piscina", undercover: "Jacuzzi" },
-        // OGGETTI E CONCETTI
-        { civilian: "Chitarra", undercover: "Basso" },
-        { civilian: "Pianoforte", undercover: "Tastiera" },
-        { civilian: "Violino", undercover: "Violoncello" },
-        { civilian: "Penna", undercover: "Matita" },
-        { civilian: "Libro", undercover: "Rivista" },
-        { civilian: "Forchetta", undercover: "Cucchiaio" },
-        { civilian: "Bicchiere", undercover: "Tazza" },
-        { civilian: "Orologio", undercover: "Braccialetto" },
-        { civilian: "Collana", undercover: "Sciarpa" },
-        { civilian: "Scarpe", undercover: "Stivali" },
-        { civilian: "Maglietta", undercover: "Camicia" },
-        { civilian: "Treno", undercover: "Metro" },
-        { civilian: "Auto", undercover: "Moto" },
-        { civilian: "Elicottero", undercover: "Aereo" },
-        { civilian: "Bicicletta", undercover: "Monopattino" },
-        { civilian: "Specchio", undercover: "Vetro" },
-        { civilian: "Finestra", undercover: "Porta" },
-        { civilian: "Divano", undercover: "Poltrona" },
-        { civilian: "Letto", undercover: "Amaca" },
-        { civilian: "Amore", undercover: "Amicizia" },
-        { civilian: "Invidia", undercover: "Gelosia" },
-        { civilian: "Tristezza", undercover: "Malinconia" },
-        { civilian: "Sogno", undercover: "Incubo" },
-        { civilian: "Inferno", undercover: "Paradiso" }
+        // --- CIBO & CUCINA (NUOVI) ---
+        { civilian: "Pandoro", undercover: "Panettone" },
+        { civilian: "Tiramisù", undercover: "Profiterole" },
+        { civilian: "Lasagna", undercover: "Cannelloni" },
+        { civilian: "Polpetta", undercover: "Polpettone" },
+        { civilian: "Tonno", undercover: "Salmone" },
+        { civilian: "Miele", undercover: "Marmellata" },
+        { civilian: "Yogurt", undercover: "Budino" },
+        { civilian: "Pistacchio", undercover: "Mandorla" },
+        { civilian: "Griglia", undercover: "Barbecue" },
+        { civilian: "Prosecco", undercover: "Spritz" },
+        { civilian: "Mojito", undercover: "Gin Tonic" },
+        { civilian: "Acqua Naturale", undercover: "Acqua Frizzante" },
+        { civilian: "Rosmarino", undercover: "Salvia" },
+        { civilian: "Aglio", undercover: "Cipolla" },
+        { civilian: "Fragola", undercover: "Lampone" },
+        { civilian: "Pera", undercover: "Mela" },
+        { civilian: "Parmigiano", undercover: "Pecorino" },
+        { civilian: "Cozze", undercover: "Vongole" },
+        { civilian: "Wurstel", undercover: "Salsiccia" },
+        { civilian: "Patatine Fritte", undercover: "Chips" },
+        { civilian: "Olio", undercover: "Aceto" },
+        { civilian: "Sale", undercover: "Pepe" },
+        { civilian: "Zucchero", undercover: "Dolcificante" },
+        { civilian: "Spaghetti", undercover: "Rigatoni" },
+        { civilian: "Tortellini", undercover: "Ravioli" },
+        { civilian: "Gambero", undercover: "Scampo" },
+        { civilian: "Limone", undercover: "Lime" },
+        { civilian: "Banana", undercover: "Platano" },
+        { civilian: "Pomodoro", undercover: "Peperone" },
+        { civilian: "Melanzana", undercover: "Peperone" }, // Alternativa
+        { civilian: "Patata", undercover: "Carota" },
+        { civilian: "Basilico", undercover: "Prezzemolo" },
+        { civilian: "Cioccolato Fondente", undercover: "Cioccolato al Latte" },
+        { civilian: "Pancetta", undercover: "Guanciale" },
+        { civilian: "Crepes", undercover: "Pancake" },
+
+        // --- OGGETTI DI CASA & QUOTIDIANI (NUOVI) ---
+        { civilian: "Cuscino", undercover: "Guanciale" }, // Inteso come oggetto letto
+        { civilian: "Pettine", undercover: "Spazzola" },
+        { civilian: "Shampoo", undercover: "Bagnoschiuma" },
+        { civilian: "Valigia", undercover: "Zaino" },
+        { civilian: "Ombrello", undercover: "Impermeabile" },
+        { civilian: "Candela", undercover: "Lampadina" },
+        { civilian: "Tappeto", undercover: "Zerbino" },
+        { civilian: "Sedia", undercover: "Sgabello" },
+        { civilian: "Chiave", undercover: "Lucchetto" },
+        { civilian: "Dentifricio", undercover: "Collutorio" },
+        { civilian: "Accendino", undercover: "Fiammifero" },
+        { civilian: "Lavatrice", undercover: "Lavastoviglie" },
+        { civilian: "Scopa", undercover: "Aspirapolvere" },
+        { civilian: "Forbici", undercover: "Tagliaunghie" },
+        { civilian: "Armadio", undercover: "Cassettiera" },
+        { civilian: "Coltello", undercover: "Taglierino" },
+        { civilian: "Piatto", undercover: "Ciotola" },
+        { civilian: "Padella", undercover: "Pentola" },
+        { civilian: "Forno", undercover: "Microonde" },
+        { civilian: "Frigorifero", undercover: "Freezer" },
+        { civilian: "Coperta", undercover: "Piumone" },
+        { civilian: "Lenzuolo", undercover: "Tovaglia" },
+        { civilian: "Tavolo", undercover: "Scrivania" },
+        { civilian: "Sapone", undercover: "Detersivo" },
+        { civilian: "Profumo", undercover: "Deodorante" },
+        { civilian: "Orologio", undercover: "Sveglia" },
+        { civilian: "Borsa", undercover: "Portafoglio" },
+        { civilian: "Gomma", undercover: "Sbianchetto" },
+        { civilian: "Quaderno", undercover: "Diario" },
+        { civilian: "Giornale", undercover: "Fumetto" },
+        { civilian: "Busta", undercover: "Pacco" },
+
+        // --- ANIMALI (NUOVI) ---
+        { civilian: "Rana", undercover: "Rospo" },
+        { civilian: "Cammello", undercover: "Dromedario" },
+        { civilian: "Polpo", undercover: "Calamaro" },
+        { civilian: "Corvo", undercover: "Merlo" },
+        { civilian: "Vipera", undercover: "Biscia" },
+        { civilian: "Zanzara", undercover: "Mosca" },
+        { civilian: "Mucca", undercover: "Toro" },
+        { civilian: "Panda", undercover: "Orso" },
+        { civilian: "Cigno", undercover: "Oca" },
+        { civilian: "Gorilla", undercover: "Scimmia" },
+        { civilian: "Criceto", undercover: "Cavia" },
+        { civilian: "Formica", undercover: "Termite" },
+        { civilian: "Gallo", undercover: "Gallina" },
+        { civilian: "Squalo", undercover: "Orca" },
+        { civilian: "Topo", undercover: "Ratto" },
+        { civilian: "Coniglio", undercover: "Lepre" },
+        { civilian: "Volpe", undercover: "Lupo" }, // Lupo già usato con Cane, ma ok qui
+        { civilian: "Cervo", undercover: "Alce" },
+        { civilian: "Pappagallo", undercover: "Canarino" },
+
+        // --- LUOGHI & NATURA (NUOVI) ---
+        { civilian: "Ascensore", undercover: "Scale mobili" },
+        { civilian: "Sauna", undercover: "Bagno Turco" },
+        { civilian: "Stadio", undercover: "Arena" },
+        { civilian: "Zoo", undercover: "Circo" },
+        { civilian: "Cantina", undercover: "Soffitta" },
+        { civilian: "Balcone", undercover: "Terrazzo" },
+        { civilian: "Bar", undercover: "Pub" },
+        { civilian: "Farmacia", undercover: "Ospedale" },
+        { civilian: "Discoteca", undercover: "Concerto" },
+        { civilian: "Campeggio", undercover: "Picnic" },
+        { civilian: "Grotta", undercover: "Caverna" },
+        { civilian: "Isola", undercover: "Penisola" },
+        { civilian: "Ponte", undercover: "Viadotto" },
+        { civilian: "Vulcano", undercover: "Cratere" },
+        { civilian: "Cascata", undercover: "Fiume" },
+        { civilian: "Prato", undercover: "Giardino" },
+        { civilian: "Aeroporto", undercover: "Stazione" },
+        { civilian: "Chiesa", undercover: "Cattedrale" },
+        { civilian: "Castello", undercover: "Fortezza" },
+
+        // --- MESTIERI (NUOVI) ---
+        { civilian: "Barbiere", undercover: "Parrucchiere" },
+        { civilian: "Idraulico", undercover: "Elettricista" },
+        { civilian: "Giudice", undercover: "Avvocato" },
+        { civilian: "Pittore", undercover: "Scultore" },
+        { civilian: "Cameriere", undercover: "Barista" },
+        { civilian: "Soldato", undercover: "Poliziotto" },
+        { civilian: "Attore", undercover: "Regista" },
+        { civilian: "Cantante", undercover: "Musicista" },
+        { civilian: "Medico", undercover: "Infermiere" },
+        { civilian: "Dentista", undercover: "Igienista" },
+        { civilian: "Cuoco", undercover: "Pasticcere" },
+        { civilian: "Pilota", undercover: "Autista" },
+        { civilian: "Maestro", undercover: "Professore" },
+        { civilian: "Architetto", undercover: "Ingegnere" },
+        { civilian: "Giornalista", undercover: "Scrittore" },
+
+        // --- ABBIGLIAMENTO (NUOVI) ---
+        { civilian: "Felpa", undercover: "Maglione" },
+        { civilian: "Jeans", undercover: "Pantaloni" },
+        { civilian: "Cappotto", undercover: "Giacca" },
+        { civilian: "Guanti", undercover: "Muffole" },
+        { civilian: "Calzini", undercover: "Calze" },
+        { civilian: "Cintura", undercover: "Bretelle" },
+        { civilian: "Cappello", undercover: "Berretto" },
+        { civilian: "Occhiali da sole", undercover: "Occhiali da vista" },
+        { civilian: "Bikini", undercover: "Costume intero" },
+        { civilian: "Papillon", undercover: "Cravatta" },
+        { civilian: "Gonna", undercover: "Vestito" },
+
+        // --- PERSONAGGI & POP CULTURE (NUOVI) ---
+        { civilian: "Super Mario", undercover: "Luigi" },
+        { civilian: "Barbie", undercover: "Bratz" },
+        { civilian: "Topolino", undercover: "Paperino" },
+        { civilian: "Shrek", undercover: "Fiona" },
+        { civilian: "Yoda", undercover: "Darth Vader" },
+        { civilian: "Homer Simpson", undercover: "Peter Griffin" },
+        { civilian: "Messi", undercover: "Ronaldo" },
+        { civilian: "Ferrari", undercover: "Lamborghini" },
+        { civilian: "Nike", undercover: "Adidas" },
+        { civilian: "Pikachu", undercover: "Charizard" },
+        { civilian: "Gandalf", undercover: "Silente" },
+        { civilian: "Thor", undercover: "Loki" },
+        { civilian: "Spongebob", undercover: "Patrick" },
+        { civilian: "Naruto", undercover: "Goku" },
+
+        // --- CONCETTI ASTRATTI (NUOVI) ---
+        { civilian: "Bugia", undercover: "Segreto" },
+        { civilian: "Paura", undercover: "Ansia" },
+        { civilian: "Fortuna", undercover: "Destino" },
+        { civilian: "Talento", undercover: "Genio" },
+        { civilian: "Rumore", undercover: "Suono" },
+        { civilian: "Caldo", undercover: "Afoso" },
+        { civilian: "Veloce", undercover: "Rapido" },
+        { civilian: "Ricco", undercover: "Benestante" },
+        { civilian: "Guerra", undercover: "Battaglia" },
+        { civilian: "Passato", undercover: "Futuro" },
+        { civilian: "Vittoria", undercover: "Trionfo" },
+        { civilian: "Errore", undercover: "Sbaglio" }
       ];
 
       // ==========================================
@@ -957,22 +1022,35 @@
         const startGame = (names, settings) => {
           setCurrentSettings(settings);
 
-          let pair = getNewWordPair();
+          let originalPair = getNewWordPair();
 
-          if (!pair) {
+          if (!originalPair) {
             const shouldReset = window.confirm(
               "🎉 Complimenti! Hai giocato tutte le parole disponibili nel database!\n\nVuoi resettare la memoria e ricominciare da capo con le stesse parole?"
             );
 
             if (shouldReset) {
               resetUsedWordsHistory();
-              pair = getNewWordPair();
+              originalPair = getNewWordPair();
             } else {
               return; 
             }
           }
 
-          if (!pair) return;
+          if (!originalPair) return;
+
+          // ============================================
+          // MODIFICA AUTOMATICA (SHUFFLE/RANDOMIZE)
+          // ============================================
+          let pair = { ...originalPair };
+          // 50% di possibilità di invertire le parole
+          if (Math.random() < 0.5) {
+             pair = {
+               civilian: originalPair.undercover,
+               undercover: originalPair.civilian
+             };
+          }
+          // ============================================
 
           setCivilianWord(pair.civilian);
 
