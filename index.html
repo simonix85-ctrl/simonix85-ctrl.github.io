@@ -11,6 +11,7 @@
 
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
@@ -49,18 +50,65 @@
       }
     </script>
     <style>
-      body {
-        background-color: #0f172a;
-        color: white;
-        overflow-x: hidden;
+      /* --- GESTIONE TEMI CSS VARIABLES --- */
+      :root {
+        --bg-color: #0f172a;
+        --text-main: #ffffff;
+        --text-muted: #94a3b8;
+        --panel-bg: rgba(30, 41, 59, 0.7);
+        --panel-border: rgba(255, 255, 255, 0.1);
+        --input-bg: rgba(0, 0, 0, 0.4);
+        --item-bg: rgba(255, 255, 255, 0.05);
+        --item-hover: rgba(255, 255, 255, 0.1);
+        --card-back: rgba(30, 41, 59, 0.8);
       }
+
+      /* CLASSE PER LA MODALITÀ CHIARA (BIANCA) */
+      body.light-mode {
+        --bg-color: #f0f9ff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --panel-bg: rgba(255, 255, 255, 0.75);
+        --panel-border: rgba(0, 0, 0, 0.1);
+        --input-bg: #ffffff;
+        --item-bg: rgba(0, 0, 0, 0.05);
+        --item-hover: rgba(0, 0, 0, 0.08);
+        --card-back: rgba(255, 255, 255, 0.9);
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        overflow-x: hidden;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .text-theme-main { color: var(--text-main); }
+      .text-theme-muted { color: var(--text-muted); }
+
       .glass-panel {
-        background: rgba(30, 41, 59, 0.7);
+        background: var(--panel-bg);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--panel-border);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        transition: background 0.3s, border-color 0.3s;
       }
+
+      .theme-input {
+        background: var(--input-bg);
+        border: 1px solid var(--panel-border);
+        color: var(--text-main);
+      }
+
+      .theme-item {
+        background: var(--item-bg);
+        border: 1px solid var(--panel-border);
+      }
+      .theme-item:hover {
+        background: var(--item-hover);
+      }
+
       .card-preserve-3d {
         transform-style: preserve-3d;
       }
@@ -75,7 +123,7 @@
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #0f172a;
+        background: var(--bg-color);
       }
       ::-webkit-scrollbar-thumb {
         background: #334155;
@@ -112,11 +160,12 @@
     </script>
 
     <script type="text/babel" data-type="module" data-presets="react">
-      import React, { useState, useEffect } from 'react';
+      import React, { useState, useEffect, useRef } from 'react';
       import ReactDOM from 'react-dom/client';
       import { 
         Trophy, Users, Settings, Plus, X, Timer, VenetianMask, HelpCircle, 
-        Eye, EyeOff, User, Skull, Crown, AlertTriangle, Home, Trash2, RotateCcw
+        Eye, EyeOff, User, Skull, Crown, AlertTriangle, Home, Trash2, RotateCcw,
+        Moon, Sun, Music, Volume2, VolumeX
       } from 'lucide-react';
       import confetti from 'canvas-confetti';
 
@@ -141,6 +190,8 @@
       const STORAGE_KEY_SETTINGS = 'undercover_saved_settings';
       const STORAGE_KEY_LEADERBOARD = 'undercover_neon_leaderboard';
       const STORAGE_KEY_USED_WORDS = 'undercover_used_words_v1';
+      const STORAGE_KEY_THEME = 'undercover_theme_mode';
+      const STORAGE_KEY_AUDIO = 'undercover_audio_settings';
 
       const WORDS_DB = [
         // --- CIBO & CUCINA (NUOVI) ---
@@ -173,7 +224,7 @@
         { civilian: "Limone", undercover: "Lime" },
         { civilian: "Banana", undercover: "Platano" },
         { civilian: "Pomodoro", undercover: "Peperone" },
-        { civilian: "Melanzana", undercover: "Peperone" }, // Alternativa
+        { civilian: "Melanzana", undercover: "Peperone" }, 
         { civilian: "Patata", undercover: "Carota" },
         { civilian: "Basilico", undercover: "Prezzemolo" },
         { civilian: "Cioccolato Fondente", undercover: "Cioccolato al Latte" },
@@ -181,7 +232,7 @@
         { civilian: "Crepes", undercover: "Pancake" },
 
         // --- OGGETTI DI CASA & QUOTIDIANI (NUOVI) ---
-        { civilian: "Cuscino", undercover: "Guanciale" }, // Inteso come oggetto letto
+        { civilian: "Cuscino", undercover: "Guanciale" }, 
         { civilian: "Pettine", undercover: "Spazzola" },
         { civilian: "Shampoo", undercover: "Bagnoschiuma" },
         { civilian: "Valigia", undercover: "Zaino" },
@@ -230,7 +281,7 @@
         { civilian: "Squalo", undercover: "Orca" },
         { civilian: "Topo", undercover: "Ratto" },
         { civilian: "Coniglio", undercover: "Lepre" },
-        { civilian: "Volpe", undercover: "Lupo" }, // Lupo già usato con Cane, ma ok qui
+        { civilian: "Volpe", undercover: "Lupo" }, 
         { civilian: "Cervo", undercover: "Alce" },
         { civilian: "Pappagallo", undercover: "Canarino" },
 
@@ -395,9 +446,9 @@
         
         const variants = {
           primary: "bg-gradient-to-r from-neon-blue to-blue-600 text-white shadow-neon-blue/30 hover:shadow-neon-blue/50 border border-white/10",
-          secondary: "bg-white/10 text-white hover:bg-white/20 border border-white/10 backdrop-blur-md",
+          secondary: "theme-item text-theme-main hover:bg-white/20 border border-white/10 backdrop-blur-md",
           danger: "bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-red-500/30 hover:shadow-red-500/50",
-          ghost: "bg-transparent text-gray-400 hover:text-white"
+          ghost: "bg-transparent text-gray-400 hover:text-theme-main"
         };
 
         return (
@@ -410,9 +461,92 @@
         );
       };
 
+      // --- Settings Modal ---
+      const SettingsModal = ({ isOpen, onClose, isDarkMode, toggleTheme, audioSettings, setAudioSettings }) => {
+        if (!isOpen) return null;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+            <div className="glass-panel w-full max-w-sm rounded-3xl p-6 relative shadow-2xl">
+              <button 
+                onClick={onClose}
+                className="absolute top-4 right-4 text-theme-muted hover:text-theme-main transition-colors"
+              >
+                <X size={24} />
+              </button>
+              
+              <h2 className="text-xl font-display font-bold text-theme-main mb-6 flex items-center gap-2">
+                <Settings size={24} className="text-neon-blue" />
+                Impostazioni
+              </h2>
+
+              <div className="space-y-6">
+                {/* TEMA */}
+                <div className="flex items-center justify-between p-4 theme-item rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    {isDarkMode ? <Moon size={24} className="text-neon-purple" /> : <Sun size={24} className="text-orange-400" />}
+                    <div>
+                      <h3 className="font-bold text-theme-main">Tema</h3>
+                      <p className="text-xs text-theme-muted">{isDarkMode ? 'Modalità Notte' : 'Modalità Giorno'}</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={!isDarkMode} 
+                      onChange={toggleTheme} 
+                      className="sr-only peer" 
+                    />
+                    <div className="w-14 h-8 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-500"></div>
+                  </label>
+                </div>
+
+                {/* MUSICA ON/OFF */}
+                <div className="flex items-center justify-between p-4 theme-item rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    <Music size={24} className="text-neon-pink" />
+                    <div>
+                      <h3 className="font-bold text-theme-main text-sm">Musica</h3>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={audioSettings.musicEnabled} 
+                      onChange={() => setAudioSettings(prev => ({...prev, musicEnabled: !prev.musicEnabled}))} 
+                      className="sr-only peer" 
+                    />
+                    <div className="w-14 h-8 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-neon-pink"></div>
+                  </label>
+                </div>
+
+                {/* SLIDER VOLUME */}
+                <div className="p-4 theme-item rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {audioSettings.volume > 0 ? <Volume2 size={20} className="text-neon-blue" /> : <VolumeX size={20} className="text-red-500" />}
+                      <span className="font-bold text-theme-main text-sm">Volume</span>
+                    </div>
+                    <span className="text-xs font-display font-bold text-neon-blue">{Math.round(audioSettings.volume * 100)}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.01" 
+                    value={audioSettings.volume}
+                    onChange={(e) => setAudioSettings(prev => ({...prev, volume: parseFloat(e.target.value)}))}
+                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-neon-blue"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
       // --- SetupScreen ---
-      const SetupScreen = ({ onStartGame }) => {
-        // --- 1. CARICAMENTO GIOCATORI SALVATI ---
+      const SetupScreen = ({ onStartGame, isDarkMode }) => {
         const [players, setPlayers] = useState(() => {
             const saved = localStorage.getItem(STORAGE_KEY_PLAYERS);
             return saved ? JSON.parse(saved) : [];
@@ -420,17 +554,10 @@
 
         const [inputValue, setInputValue] = useState('');
 
-        // --- 2. CARICAMENTO IMPOSTAZIONI SALVATE ---
         const [settings, setSettings] = useState(() => {
             const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // MIGRATION: Convert old boolean mrWhiteEnabled to number mrWhiteCount if needed
-                if (typeof parsed.mrWhiteEnabled !== 'undefined') {
-                    parsed.mrWhiteCount = parsed.mrWhiteEnabled ? 1 : 0;
-                    delete parsed.mrWhiteEnabled;
-                }
-                // Ensure mrWhiteCount exists
                 if (typeof parsed.mrWhiteCount === 'undefined') parsed.mrWhiteCount = 1;
                 return parsed;
             }
@@ -449,12 +576,10 @@
           setLeaderboard(getLeaderboard());
         }, [activeTab]);
 
-        // --- 3. SALVATAGGIO AUTOMATICO IMPOSTAZIONI ---
         useEffect(() => {
             localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
         }, [settings]);
 
-        // --- 4. SALVATAGGIO AUTOMATICO GIOCATORI ---
         useEffect(() => {
             localStorage.setItem(STORAGE_KEY_PLAYERS, JSON.stringify(players));
         }, [players]);
@@ -473,7 +598,6 @@
           setPlayers(newPlayers);
         };
 
-        // --- RESET FUNCTIONS ---
         const handleClearPlayers = () => {
           if (players.length === 0) return;
           if (window.confirm("Sei sicuro di voler CANCELLARE tutti i giocatori dalla lista?")) {
@@ -507,41 +631,41 @@
         const isValidConfig = players.length >= 3 && totalImpostors > 0 && totalImpostors < players.length;
 
         return (
-          <div className="flex flex-col h-full w-full max-w-5xl mx-auto relative z-10 p-4 md:p-8 bg-dark-bg/50 md:bg-dark-bg/0">
+          <div className="flex flex-col h-full w-full max-w-5xl mx-auto relative z-10 p-4 md:p-8 bg-transparent">
             {/* Header */}
             <div className="text-center mb-10 pt-4">
-              <h1 className="font-display text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-white to-neon-pink drop-shadow-[0_0_25px_rgba(0,243,255,0.4)] animate-pulse-slow break-all">
-                UNDERPIEDI
+              <h1 className="font-display text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-gray-200 to-neon-pink drop-shadow-[0_0_25px_rgba(0,243,255,0.4)] animate-pulse-slow break-all">
+                𝕌ℕ𝔻𝔼ℝℂ𝕆𝕍𝔼ℝ
               </h1>
-              <p className="text-gray-400 text-xs md:text-sm tracking-[0.6em] mt-2 uppercase font-bold">Neon Edition</p>
+              <p className="text-theme-muted text-xs md:text-sm tracking-[0.6em] mt-2 uppercase font-bold">𝑺𝑷𝑬𝑪𝑰𝑨𝑳 𝑬𝑫𝑰𝑻𝑰𝑶𝑵</p>
             </div>
 
-            {/* Aggiunta delle immagini dei piedi */}
+            {/* Aggiunta delle immagini */}
             <div className="flex justify-center gap-6 mt-8">
               <img 
-                src="data:image/jpeg;base64,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" 
-                alt="Piede con smalto bianco 1" 
+                src="https://www.undercovergioco.it/logo.png" 
+                alt="" 
                 className="w-28 h-28 md:w-32 md:h-32 object-cover rounded-2xl border-2 border-neon-blue/30 shadow-lg shadow-neon-blue/20 rotate-[-5deg]"
               />
               <img 
-                src="data:image/jpeg;base64,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" 
-                alt="Piede con smalto bianco 2" 
+                src="https://annarossoni.it/prod/wp-content/uploads/2025/02/sindrome-impostore-6.jpg" 
+                alt="" 
                 className="w-28 h-28 md:w-32 md:h-32 object-cover rounded-2xl border-2 border-neon-pink/30 shadow-lg shadow-neon-pink/20 rotate-[5deg]"
               />
             </div>
 
             {/* Tabs */}
-            <div className="flex justify-center gap-6 mb-8">
-              <div className="bg-white/5 p-1.5 rounded-2xl inline-flex shadow-lg border border-white/5 backdrop-blur-sm">
+            <div className="flex justify-center gap-6 mb-8 mt-8">
+              <div className="theme-item p-1.5 rounded-2xl inline-flex shadow-lg backdrop-blur-sm">
                 <button 
                   onClick={() => setActiveTab('setup')}
-                  className={`px-8 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 ${activeTab === 'setup' ? 'bg-gradient-to-r from-neon-blue/20 to-blue-500/20 text-white shadow-lg border border-neon-blue/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                  className={`px-8 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 ${activeTab === 'setup' ? 'bg-gradient-to-r from-neon-blue/20 to-blue-500/20 text-theme-main shadow-lg border border-neon-blue/30' : 'text-theme-muted hover:text-theme-main hover:bg-white/5'}`}
                 >
                   GIOCA
                 </button>
                 <button 
                   onClick={() => setActiveTab('leaderboard')}
-                  className={`px-8 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 ${activeTab === 'leaderboard' ? 'bg-gradient-to-r from-neon-pink/20 to-purple-500/20 text-white shadow-lg border border-neon-pink/30' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                  className={`px-8 py-3 text-sm md:text-base font-bold rounded-xl transition-all duration-300 ${activeTab === 'leaderboard' ? 'bg-gradient-to-r from-neon-pink/20 to-purple-500/20 text-theme-main shadow-lg border border-neon-pink/30' : 'text-theme-muted hover:text-theme-main hover:bg-white/5'}`}
                 >
                   CLASSIFICA
                 </button>
@@ -554,15 +678,15 @@
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
                   
                   {/* Player Input Column */}
-                  <div className="glass-panel p-6 md:p-8 rounded-[2rem] flex flex-col h-full shadow-2xl border border-white/10">
+                  <div className="glass-panel p-6 md:p-8 rounded-[2rem] flex flex-col h-full shadow-2xl">
                     <div className="flex justify-between items-center mb-5">
-                      <h3 className="text-sm font-bold text-gray-400 uppercase flex items-center gap-2 tracking-wider">
+                      <h3 className="text-sm font-bold text-theme-muted uppercase flex items-center gap-2 tracking-wider">
                         <Users size={18} className="text-neon-blue" /> Giocatori ({players.length})
                       </h3>
                       {players.length > 0 && (
                         <button 
                           onClick={handleClearPlayers}
-                          className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-colors flex items-center gap-2 text-xs uppercase font-bold tracking-wider"
+                          className="text-theme-muted hover:text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-colors flex items-center gap-2 text-xs uppercase font-bold tracking-wider"
                           title="Cancella tutti i giocatori"
                         >
                           <Trash2 size={16} /> Reset
@@ -577,7 +701,7 @@
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
                         placeholder="Nome giocatore..."
-                        className="flex-1 bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all text-lg shadow-inner"
+                        className="flex-1 theme-input rounded-2xl px-6 py-4 placeholder-gray-500 focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all text-lg shadow-inner"
                       />
                       <button 
                         onClick={addPlayer} 
@@ -591,18 +715,18 @@
                     <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                        <div className="flex flex-wrap gap-3 content-start">
                           {players.map((p, i) => (
-                            <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 pl-5 pr-2 py-3 rounded-2xl animate-fadeIn group hover:border-neon-blue/30 hover:bg-neon-blue/5 transition-all shadow-md">
-                              <span className="font-bold text-lg text-white group-hover:text-neon-blue transition-colors">{p}</span>
+                            <div key={i} className="flex items-center gap-3 theme-item pl-5 pr-2 py-3 rounded-2xl animate-fadeIn group hover:border-neon-blue/30 transition-all shadow-md">
+                              <span className="font-bold text-lg text-theme-main group-hover:text-neon-blue transition-colors">{p}</span>
                               <button 
                                   onClick={() => removePlayer(i)} 
-                                  className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 transition-colors rounded-xl p-2"
+                                  className="text-theme-muted hover:text-red-500 hover:bg-red-500/10 transition-colors rounded-xl p-2"
                               >
                                 <X size={18} />
                               </button>
                             </div>
                           ))}
                           {players.length === 0 && (
-                              <div className="w-full h-48 flex flex-col items-center justify-center text-gray-500 border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
+                              <div className="w-full h-48 flex flex-col items-center justify-center text-theme-muted border-2 border-dashed border-gray-500/20 rounded-3xl bg-black/5">
                                   <Users size={48} className="mb-4 opacity-30 text-neon-blue" />
                                   <p className="text-base font-medium">Nessun giocatore</p>
                                   <p className="text-sm opacity-60">Aggiungi almeno 3 giocatori</p>
@@ -616,64 +740,64 @@
                   <div className="space-y-6 flex flex-col">
                     
                     {/* Roles Settings */}
-                    <div className="glass-panel p-6 md:p-8 rounded-[2rem] space-y-8 flex-1 border border-white/10 shadow-2xl">
-                      <h3 className="text-sm font-bold text-gray-400 uppercase mb-2 flex items-center gap-2 tracking-wider">
+                    <div className="glass-panel p-6 md:p-8 rounded-[2rem] space-y-8 flex-1 shadow-2xl">
+                      <h3 className="text-sm font-bold text-theme-muted uppercase mb-2 flex items-center gap-2 tracking-wider">
                         <Settings size={18} className="text-neon-pink" /> Ruoli
                       </h3>
 
                       {/* Mister White Counter */}
-                      <div className="flex items-center justify-between p-2 hover:bg-white/5 rounded-2xl transition-colors">
+                      <div className="flex items-center justify-between p-2 theme-item rounded-2xl transition-colors">
                         <div className="flex items-center gap-5">
-                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.mrWhiteCount > 0 ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-110' : 'bg-white/5 text-gray-500'}`}>
+                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.mrWhiteCount > 0 ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-110' : 'theme-item text-gray-500'}`}>
                             <HelpCircle size={28} />
                           </div>
                           <div>
-                            <h3 className={`font-bold text-xl transition-colors ${settings.mrWhiteCount > 0 ? 'text-white' : 'text-gray-500'}`}>Mister White</h3>
-                            <p className="text-sm text-gray-500 mt-1">Non conosce la parola</p>
+                            <h3 className={`font-bold text-xl transition-colors ${settings.mrWhiteCount > 0 ? 'text-theme-main' : 'text-theme-muted'}`}>Mister White</h3>
+                            <p className="text-sm text-theme-muted mt-1">Non conosce la parola</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 bg-black/40 rounded-2xl p-2 border border-white/5">
-                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white disabled:opacity-30 transition-colors" 
+                        <div className="flex items-center gap-4 theme-input rounded-2xl p-2">
+                           <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main disabled:opacity-30 transition-colors" 
                             disabled={settings.mrWhiteCount === 0}
                             onClick={() => setSettings(s => ({...s, mrWhiteCount: Math.max(0, s.mrWhiteCount - 1)}))}>-</button>
-                           <span className="font-display font-bold w-8 text-center text-white text-2xl">{settings.mrWhiteCount}</span>
-                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white transition-colors"
+                           <span className="font-display font-bold w-8 text-center text-theme-main text-2xl">{settings.mrWhiteCount}</span>
+                           <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main transition-colors"
                             onClick={() => setSettings(s => ({...s, mrWhiteCount: s.mrWhiteCount + 1}))}>+</button>
                         </div>
                       </div>
 
                       {/* Undercover Counter */}
-                      <div className="flex items-center justify-between p-2 hover:bg-white/5 rounded-2xl transition-colors">
+                      <div className="flex items-center justify-between p-2 theme-item rounded-2xl transition-colors">
                         <div className="flex items-center gap-5">
-                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.undercoverCount > 0 ? 'bg-neon-pink text-black shadow-[0_0_20px_rgba(255,0,255,0.3)] scale-110' : 'bg-white/5 text-gray-500'}`}>
+                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.undercoverCount > 0 ? 'bg-neon-pink text-black shadow-[0_0_20px_rgba(255,0,255,0.3)] scale-110' : 'theme-item text-gray-500'}`}>
                             <VenetianMask size={28} />
                           </div>
                           <div>
-                            <h3 className={`font-bold text-xl transition-colors ${settings.undercoverCount > 0 ? 'text-white' : 'text-gray-500'}`}>Infiltrati</h3>
-                            <p className="text-sm text-gray-500 mt-1">Hanno parola diversa</p>
+                            <h3 className={`font-bold text-xl transition-colors ${settings.undercoverCount > 0 ? 'text-theme-main' : 'text-theme-muted'}`}>Infiltrati</h3>
+                            <p className="text-sm text-theme-muted mt-1">Hanno parola diversa</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 bg-black/40 rounded-2xl p-2 border border-white/5">
-                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white disabled:opacity-30 transition-colors" 
+                        <div className="flex items-center gap-4 theme-input rounded-2xl p-2">
+                           <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main disabled:opacity-30 transition-colors" 
                             disabled={settings.undercoverCount === 0}
                             onClick={() => setSettings(s => ({...s, undercoverCount: Math.max(0, s.undercoverCount - 1)}))}>-</button>
                            <span className="font-display font-bold w-8 text-center text-neon-pink text-2xl">{settings.undercoverCount}</span>
-                           <button className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-xl hover:bg-white/20 text-white transition-colors"
+                           <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main transition-colors"
                             onClick={() => setSettings(s => ({...s, undercoverCount: s.undercoverCount + 1}))}>+</button>
                         </div>
                       </div>
                     </div>
 
                     {/* Timer Settings */}
-                    <div className="glass-panel p-6 md:p-8 rounded-[2rem] space-y-6 flex-1 border border-white/10 shadow-2xl">
+                    <div className="glass-panel p-6 md:p-8 rounded-[2rem] space-y-6 flex-1 shadow-2xl">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.timerEnabled ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(10,255,0,0.3)]' : 'bg-white/5 text-gray-500'}`}>
+                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.timerEnabled ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(10,255,0,0.3)]' : 'theme-item text-gray-500'}`}>
                             <Timer size={28} />
                           </div>
                           <div>
-                            <h3 className={`font-bold text-xl transition-colors ${settings.timerEnabled ? 'text-white' : 'text-gray-500'}`}>Timer</h3>
-                            <p className="text-sm text-gray-500 mt-1">Tempo per discutere</p>
+                            <h3 className={`font-bold text-xl transition-colors ${settings.timerEnabled ? 'text-theme-main' : 'text-theme-muted'}`}>Timer</h3>
+                            <p className="text-sm text-theme-muted mt-1">Tempo per discutere</p>
                           </div>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
@@ -683,13 +807,13 @@
                       </div>
 
                       {settings.timerEnabled && (
-                        <div className="flex items-center justify-between pl-2 animate-fadeIn bg-white/5 p-4 rounded-2xl border border-white/5">
+                        <div className="flex items-center justify-between pl-2 animate-fadeIn theme-item p-4 rounded-2xl">
                            <span className="text-base font-bold text-gray-300">Durata timer</span>
                            <div className="flex items-center gap-4">
-                             <button className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-lg hover:bg-white/20 text-white transition-colors" 
+                             <button className="w-10 h-10 flex items-center justify-center theme-item rounded-lg hover:bg-white/20 text-theme-main transition-colors" 
                               onClick={() => setSettings(s => ({...s, timerDuration: Math.max(30, s.timerDuration - 30)}))}>-</button>
                              <span className="font-display font-bold w-20 text-center text-neon-green text-xl tracking-wider">{formatTime(settings.timerDuration)}</span>
-                             <button className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-lg hover:bg-white/20 text-white transition-colors"
+                             <button className="w-10 h-10 flex items-center justify-center theme-item rounded-lg hover:bg-white/20 text-theme-main transition-colors"
                               onClick={() => setSettings(s => ({...s, timerDuration: s.timerDuration + 30}))}>+</button>
                            </div>
                         </div>
@@ -710,9 +834,9 @@
               </div>
             ) : (
               <div className="flex-1 min-h-0 flex flex-col pb-24">
-                <div className="glass-panel rounded-3xl overflow-hidden border border-white/10 flex-1 overflow-y-auto">
+                <div className="glass-panel rounded-3xl overflow-hidden border-0 flex-1 overflow-y-auto">
                   <table className="w-full text-left">
-                    <thead className="bg-white/5 text-gray-400 text-xs uppercase tracking-widest sticky top-0 bg-dark-bg/90 backdrop-blur-md z-10">
+                    <thead className="theme-item text-theme-muted text-xs uppercase tracking-widest sticky top-0 backdrop-blur-md z-10">
                       <tr>
                         <th className="p-6 md:p-8">Rank</th>
                         <th className="p-6 md:p-8">Player</th>
@@ -723,16 +847,16 @@
                     <tbody className="divide-y divide-white/5">
                       {leaderboard.map((entry, idx) => (
                         <tr key={entry.name} className="hover:bg-white/5 transition-colors group">
-                          <td className="p-6 md:p-8 font-display font-bold text-gray-500 group-hover:text-white transition-colors text-lg">
+                          <td className="p-6 md:p-8 font-display font-bold text-theme-muted group-hover:text-theme-main transition-colors text-lg">
                             {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
                           </td>
-                          <td className="p-6 md:p-8 font-bold text-xl md:text-2xl">{entry.name}</td>
+                          <td className="p-6 md:p-8 font-bold text-xl md:text-2xl text-theme-main">{entry.name}</td>
                           <td className="p-6 md:p-8 text-right font-display text-neon-blue text-2xl shadow-neon-blue drop-shadow-sm">{entry.wins}</td>
-                          <td className="p-6 md:p-8 text-right font-display text-gray-500 hidden md:table-cell text-xl">{entry.matches}</td>
+                          <td className="p-6 md:p-8 text-right font-display text-theme-muted hidden md:table-cell text-xl">{entry.matches}</td>
                         </tr>
                       ))}
                       {leaderboard.length === 0 && (
-                        <tr><td colSpan={4} className="p-16 text-center text-gray-500 italic text-lg">Nessuna partita registrata</td></tr>
+                        <tr><td colSpan={4} className="p-16 text-center text-theme-muted italic text-lg">Nessuna partita registrata</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -753,7 +877,7 @@
             )}
 
             {activeTab === 'setup' && (
-              <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-dark-bg via-dark-bg to-transparent z-30 pointer-events-none flex justify-center">
+              <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-dark-bg/80 via-dark-bg/50 to-transparent z-30 pointer-events-none flex justify-center">
                 <div className="w-full max-w-2xl pointer-events-auto">
                   <Button fullWidth onClick={handleStart} disabled={!isValidConfig} className="py-5 text-xl tracking-[0.2em] shadow-[0_0_40px_rgba(0,243,255,0.3)] hover:shadow-[0_0_60px_rgba(0,243,255,0.5)] border-t border-white/20">
                     INIZIA LA PARTITA
@@ -804,8 +928,8 @@
         return (
           <div className="h-full w-full flex flex-col items-center justify-center p-6 relative">
             <div className="text-center mb-10 animate-float">
-              <h2 className="text-gray-400 uppercase tracking-[0.3em] text-sm md:text-base mb-3">Turno di</h2>
-              <h1 className="font-display text-5xl md:text-6xl font-black text-white transition-opacity duration-300 drop-shadow-xl">
+              <h2 className="text-theme-muted uppercase tracking-[0.3em] text-sm md:text-base mb-3">Turno di</h2>
+              <h1 className="font-display text-5xl md:text-6xl font-black text-theme-main transition-opacity duration-300 drop-shadow-xl">
                  {player.name}
               </h1>
             </div>
@@ -817,32 +941,32 @@
               <div className={`relative w-full h-full duration-700 transition-all card-preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
                 {/* FRONT */}
                 <div className="absolute inset-0 w-full h-full card-backface-hidden">
-                  <div className="w-full h-full glass-panel rounded-[2.5rem] border-2 border-neon-blue/30 flex flex-col items-center justify-center p-10 shadow-[0_0_30px_rgba(0,243,255,0.1)] group-hover:shadow-[0_0_60px_rgba(0,243,255,0.3)] transition-shadow bg-dark-card/50">
+                  <div className="w-full h-full glass-panel rounded-[2.5rem] border-2 border-neon-blue/30 flex flex-col items-center justify-center p-10 shadow-[0_0_30px_rgba(0,243,255,0.1)] group-hover:shadow-[0_0_60px_rgba(0,243,255,0.3)] transition-shadow">
                     <div className="w-32 h-32 rounded-full bg-neon-blue/10 flex items-center justify-center mb-8 animate-pulse-slow ring-1 ring-neon-blue/30">
                       <Eye size={64} className="text-neon-blue" />
                     </div>
-                    <h3 className="font-display text-3xl font-bold text-center mb-4 tracking-wider">TOCCA PER<br/>RIVELARE</h3>
-                    <p className="text-gray-400 text-center text-sm md:text-base max-w-[80%]">Assicurati che nessun altro stia guardando lo schermo</p>
+                    <h3 className="font-display text-3xl font-bold text-center mb-4 tracking-wider text-theme-main">TOCCA PER<br/>RIVELARE</h3>
+                    <p className="text-theme-muted text-center text-sm md:text-base max-w-[80%]">Assicurati che nessun altro stia guardando lo schermo</p>
                   </div>
                 </div>
 
                 {/* BACK */}
                 <div className="absolute inset-0 w-full h-full card-backface-hidden rotate-y-180">
-                  <div className={`w-full h-full glass-panel rounded-[2.5rem] border-2 flex flex-col items-center justify-center p-10 shadow-2xl bg-dark-card/80 backdrop-blur-xl ${
+                  <div className={`w-full h-full rounded-[2.5rem] border-2 flex flex-col items-center justify-center p-10 shadow-2xl backdrop-blur-xl ${
                     player.role === Role.CIVILIAN ? 'border-neon-blue/50 shadow-neon-blue/20' : 
                     player.role === Role.UNDERCOVER ? 'border-neon-pink/50 shadow-neon-pink/20' : 
                     'border-white/50 shadow-white/20'
-                  }`}>
+                  }`} style={{backgroundColor: 'var(--card-back)'}}>
                     <div className="mb-8 transform scale-110">
                       {getRoleIcon()}
                     </div>
                     
-                    <h3 className="font-display text-2xl font-bold mb-10 opacity-80 tracking-[0.2em] uppercase">
+                    <h3 className="font-display text-2xl font-bold mb-10 opacity-80 tracking-[0.2em] uppercase text-white">
                       {getRoleName()}
                     </h3>
 
                     <div className="w-full bg-black/40 rounded-2xl p-8 text-center border border-white/5 mb-10 shadow-inner">
-                      <p className="text-xs text-gray-500 uppercase mb-3 tracking-wider">La tua parola segreta</p>
+                      <p className="text-xs text-gray-400 uppercase mb-3 tracking-wider">La tua parola segreta</p>
                       <p className="font-display text-4xl md:text-5xl font-black tracking-wider break-words text-white drop-shadow-lg">
                         {player.role === Role.MR_WHITE ? "???" : player.word}
                       </p>
@@ -900,22 +1024,22 @@
         return (
           <div className="h-full w-full flex flex-col p-6">
             {/* Top Bar */}
-            <div className="flex justify-between items-center mb-8 sticky top-0 z-20 bg-dark-bg/80 backdrop-blur-sm py-4">
+            <div className="flex justify-between items-center mb-8 sticky top-0 z-20 bg-inherit/80 backdrop-blur-sm py-4">
               {settings.timerEnabled ? (
-                <div className="px-6 py-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md shadow-lg">
-                  <span className={`font-display font-bold text-3xl ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                <div className="px-6 py-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md shadow-lg theme-item">
+                  <span className={`font-display font-bold text-3xl ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-theme-main'}`}>
                     {gameStatus === 'playing' ? formatTime(timeLeft) : 'VOTAZIONE'}
                   </span>
                 </div>
               ) : (
-                 <div className="px-6 py-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md shadow-lg">
+                 <div className="px-6 py-3 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md shadow-lg theme-item">
                    <span className="font-display font-bold text-lg text-neon-blue tracking-wider">
                       {gameStatus === 'playing' ? 'IN CORSO' : 'VOTAZIONE'}
                    </span>
                  </div>
               )}
               
-              <div className="text-sm font-medium text-right text-gray-400 bg-black/20 px-4 py-2 rounded-lg">
+              <div className="text-sm font-medium text-right text-theme-muted bg-black/10 px-4 py-2 rounded-lg theme-item">
                 <p className="mb-1"><span className="text-green-400">●</span> VIVI: {players.filter(p => p.isAlive).length}</p>
                 <p><span className="text-red-500">●</span> ELIMINATI: {players.filter(p => !p.isAlive).length}</p>
               </div>
@@ -930,9 +1054,9 @@
                     onClick={() => handlePlayerClick(p.id)}
                     className={`
                       relative aspect-square rounded-3xl p-4 flex flex-col items-center justify-center text-center transition-all duration-300 border-2 group
-                      ${!p.isAlive ? 'opacity-40 grayscale border-gray-800 bg-black/50' : ''}
+                      ${!p.isAlive ? 'opacity-40 grayscale border-gray-500 bg-black/50' : ''}
                       ${gameStatus === 'voting' && p.isAlive ? 'cursor-pointer hover:scale-[1.02] active:scale-95 animate-pulse-slow hover:shadow-neon-blue/20 hover:border-neon-blue/50' : ''}
-                      ${selectedPlayer === p.id ? 'border-red-500 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.3)] scale-[0.98]' : 'border-white/5 bg-white/5 hover:bg-white/10'}
+                      ${selectedPlayer === p.id ? 'border-red-500 bg-red-500/10 shadow-[0_0_30px_rgba(239,68,68,0.3)] scale-[0.98]' : 'border-transparent theme-item hover:border-white/20'}
                     `}
                   >
                     {/* Starter Badge */}
@@ -944,7 +1068,7 @@
 
                     {/* Avatar */}
                     <div className={`
-                      w-16 h-16 md:w-20 md:h-20 rounded-full mb-4 flex items-center justify-center text-3xl md:text-4xl font-bold shadow-xl ring-4 ring-black/20
+                      w-16 h-16 md:w-20 md:h-20 rounded-full mb-4 flex items-center justify-center text-3xl md:text-4xl font-bold shadow-xl ring-4 ring-black/10
                       ${!p.isAlive ? 'bg-gray-800 text-gray-500' : 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'}
                     `}>
                       {!p.isAlive ? <Skull size={28} /> : p.name.charAt(0).toUpperCase()}
@@ -954,7 +1078,7 @@
                     <h3 className={`
                       font-display font-black leading-tight break-words w-full px-2
                       ${p.name.length > 8 ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'}
-                      ${p.isAlive ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 group-hover:from-neon-blue group-hover:to-white transition-all' : 'text-gray-500 line-through decoration-red-500 decoration-2'}
+                      ${p.isAlive ? 'text-transparent bg-clip-text bg-gradient-to-r from-theme-main to-gray-400 group-hover:from-neon-blue group-hover:to-white transition-all' : 'text-gray-500 line-through decoration-red-500 decoration-2'}
                     `}>
                       {p.name}
                     </h3>
@@ -976,7 +1100,7 @@
             </div>
 
             {/* Action Bar */}
-            <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-dark-bg via-dark-bg to-transparent z-30">
+            <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-dark-bg/50 via-dark-bg/20 to-transparent z-30">
               <div className="max-w-2xl mx-auto">
                 {gameStatus === 'playing' ? (
                   <Button 
@@ -994,9 +1118,9 @@
                   <div className="space-y-4">
                     <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-4 justify-center backdrop-blur-md">
                       <AlertTriangle className="text-red-500 flex-shrink-0 w-6 h-6" />
-                      <p className="text-base md:text-lg text-red-100 font-medium">
+                      <p className="text-base md:text-lg text-red-500 font-medium">
                         {selectedPlayer 
-                          ? <span>Vuoi eliminare <span className="font-bold text-white underline decoration-red-500">{players.find(p => p.id === selectedPlayer)?.name}</span>?</span>
+                          ? <span>Vuoi eliminare <span className="font-bold underline decoration-red-500 text-theme-main">{players.find(p => p.id === selectedPlayer)?.name}</span>?</span>
                           : "Seleziona un giocatore da eliminare"}
                       </p>
                     </div>
@@ -1025,6 +1149,11 @@
         const [civilianWord, setCivilianWord] = useState('');
         const [gameStatus, setGameStatus] = useState('playing');
         const [winners, setWinners] = useState(null);
+        const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+        const [isDarkMode, setIsDarkMode] = useState(() => {
+          const saved = localStorage.getItem(STORAGE_KEY_THEME);
+          return saved ? JSON.parse(saved) : true;
+        });
         
         const [currentSettings, setCurrentSettings] = useState({
           mrWhiteCount: 1,
@@ -1032,6 +1161,40 @@
           timerEnabled: true,
           timerDuration: 60
         });
+
+        // --- AUDIO STATE ---
+        const audioRef = useRef(null);
+        const [audioSettings, setAudioSettings] = useState(() => {
+          const saved = localStorage.getItem(STORAGE_KEY_AUDIO);
+          return saved ? JSON.parse(saved) : { musicEnabled: true, volume: 0.3 };
+        });
+
+        // Theme Toggle
+        useEffect(() => {
+          if (isDarkMode) {
+            document.body.classList.remove('light-mode');
+          } else {
+            document.body.classList.add('light-mode');
+          }
+          localStorage.setItem(STORAGE_KEY_THEME, JSON.stringify(isDarkMode));
+        }, [isDarkMode]);
+
+        // --- AUDIO CONTROL ---
+        useEffect(() => {
+          localStorage.setItem(STORAGE_KEY_AUDIO, JSON.stringify(audioSettings));
+          if (audioRef.current) {
+            audioRef.current.volume = audioSettings.volume;
+            if (audioSettings.musicEnabled) {
+              audioRef.current.play().catch(e => console.log("Interazione richiesta per audio"));
+            } else {
+              audioRef.current.pause();
+            }
+          }
+        }, [audioSettings]);
+
+        const toggleTheme = () => {
+          setIsDarkMode(!isDarkMode);
+        };
 
         const startGame = (names, settings) => {
           setCurrentSettings(settings);
@@ -1053,25 +1216,18 @@
 
           if (!originalPair) return;
 
-          // ============================================
-          // MODIFICA AUTOMATICA (SHUFFLE/RANDOMIZE)
-          // ============================================
           let pair = { ...originalPair };
-          // 50% di possibilità di invertire le parole
           if (Math.random() < 0.5) {
              pair = {
                civilian: originalPair.undercover,
                undercover: originalPair.civilian
              };
           }
-          // ============================================
 
           setCivilianWord(pair.civilian);
 
           let roles = [];
-          // Add Mr. Whites based on count
           for (let i = 0; i < settings.mrWhiteCount; i++) roles.push(Role.MR_WHITE);
-          // Add Undercovers
           for (let i = 0; i < settings.undercoverCount; i++) roles.push(Role.UNDERCOVER);
           
           while (roles.length < names.length) roles.push(Role.CIVILIAN);
@@ -1191,15 +1347,37 @@
         };
 
         return (
-          <div className="w-full min-h-screen bg-dark-bg text-white font-sans overflow-x-hidden flex flex-col items-center">
+          <div className="w-full min-h-screen font-sans overflow-x-hidden flex flex-col items-center relative transition-colors duration-300">
+            {/* Background Effects */}
             <div className="fixed top-[-20%] left-[-20%] w-[50vw] h-[50vw] bg-neon-blue/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow z-0"></div>
             <div className="fixed bottom-[-20%] right-[-20%] w-[50vw] h-[50vw] bg-neon-pink/10 rounded-full blur-[100px] pointer-events-none animate-pulse-slow z-0" style={{ animationDelay: '1.5s' }}></div>
+
+            {/* AUDIO ELEMENT */}
+            <audio ref={audioRef} loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+            {/* Global Settings Button */}
+            <button 
+              onClick={() => setIsSettingsOpen(true)}
+              className="fixed top-4 right-4 z-40 p-3 rounded-full bg-white/5 hover:bg-white/10 text-theme-main border border-white/10 backdrop-blur-md shadow-lg transition-all hover:scale-105 active:scale-95"
+            >
+              <Settings size={24} />
+            </button>
+
+            {/* Settings Modal */}
+            <SettingsModal 
+              isOpen={isSettingsOpen} 
+              onClose={() => setIsSettingsOpen(false)}
+              isDarkMode={isDarkMode}
+              toggleTheme={toggleTheme}
+              audioSettings={audioSettings}
+              setAudioSettings={setAudioSettings}
+            />
 
             <div className="relative z-10 w-full h-full flex-1 flex flex-col max-w-7xl mx-auto">
               
               {phase === GamePhase.SETUP && (
                 <div className="flex-1 flex items-center justify-center p-4">
-                   <SetupScreen onStartGame={startGame} />
+                   <SetupScreen onStartGame={startGame} isDarkMode={isDarkMode} />
                 </div>
               )}
 
@@ -1228,14 +1406,14 @@
                   <div className="mb-8 animate-bounce drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]">
                     {winners.icon}
                   </div>
-                  <h2 className="text-gray-400 uppercase tracking-[0.3em] text-lg mb-4">Vittoria</h2>
+                  <h2 className="text-theme-muted uppercase tracking-[0.3em] text-lg mb-4">Vittoria</h2>
                   <h1 className="font-display text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-neon-pink mb-12 drop-shadow-2xl">
                     {winners.team}
                   </h1>
                   
                   <div className="glass-panel p-8 rounded-3xl w-full mb-12 transform hover:scale-105 transition-transform duration-300">
-                    <h3 className="text-sm text-gray-400 mb-4 uppercase tracking-wider">Parola Segreta</h3>
-                    <p className="text-4xl font-bold text-white tracking-wide">{civilianWord}</p>
+                    <h3 className="text-sm text-theme-muted mb-4 uppercase tracking-wider">Parola Segreta</h3>
+                    <p className="text-4xl font-bold text-theme-main tracking-wide">{civilianWord}</p>
                   </div>
 
                   <div className="space-y-4 w-full">
