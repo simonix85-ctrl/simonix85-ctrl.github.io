@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <title>Underpiedi</title>
+    <title>Undercover</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -539,6 +539,22 @@
                     className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-neon-blue"
                   />
                 </div>
+
+                {/* SEZIONE FEEDBACK GOOGLE FORM */}
+                <div 
+                  className="flex items-center justify-between p-4 theme-item rounded-2xl cursor-pointer hover:bg-neon-blue/10 transition-all group"
+                  onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8d-9CGjw13tammArd4822xraNg8-d0gzfZ-mEAj7q2YW2XA/viewform?usp=dialog', '_blank')}
+                >
+                  <div className="flex items-center gap-3">
+                    <HelpCircle size={24} className="text-neon-blue group-hover:animate-bounce" />
+                    <div>
+                      <h3 className="font-bold text-theme-main text-sm">Problemi o consigli?</h3>
+                      <p className="text-xs text-theme-muted">Dacci un suggerimento su Google</p>
+                    </div>
+                  </div>
+                  <Plus size={18} className="text-theme-muted group-hover:text-neon-blue" />
+                </div>
+
               </div>
             </div>
           </div>
