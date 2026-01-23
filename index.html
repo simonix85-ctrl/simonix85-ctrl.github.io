@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <title>Undercover</title>
+    <title>UnderCover</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -165,7 +165,7 @@
       import { 
         Trophy, Users, Settings, Plus, X, Timer, VenetianMask, HelpCircle, 
         Eye, EyeOff, User, Skull, Crown, AlertTriangle, Home, Trash2, RotateCcw,
-        Moon, Sun, Music, Volume2, VolumeX
+        Moon, Sun, Music, Volume2, VolumeX, Lightbulb
       } from 'lucide-react';
       import confetti from 'canvas-confetti';
 
@@ -194,177 +194,177 @@
       const STORAGE_KEY_AUDIO = 'undercover_audio_settings';
 
       const WORDS_DB = [
-        // --- CIBO & CUCINA (NUOVI) ---
-        { civilian: "Pandoro", undercover: "Panettone" },
-        { civilian: "Tiramisù", undercover: "Profiterole" },
-        { civilian: "Lasagna", undercover: "Cannelloni" },
-        { civilian: "Polpetta", undercover: "Polpettone" },
-        { civilian: "Tonno", undercover: "Salmone" },
-        { civilian: "Miele", undercover: "Marmellata" },
-        { civilian: "Yogurt", undercover: "Budino" },
-        { civilian: "Pistacchio", undercover: "Mandorla" },
-        { civilian: "Griglia", undercover: "Barbecue" },
-        { civilian: "Prosecco", undercover: "Spritz" },
-        { civilian: "Mojito", undercover: "Gin Tonic" },
-        { civilian: "Acqua Naturale", undercover: "Acqua Frizzante" },
-        { civilian: "Rosmarino", undercover: "Salvia" },
-        { civilian: "Aglio", undercover: "Cipolla" },
-        { civilian: "Fragola", undercover: "Lampone" },
-        { civilian: "Pera", undercover: "Mela" },
-        { civilian: "Parmigiano", undercover: "Pecorino" },
-        { civilian: "Cozze", undercover: "Vongole" },
-        { civilian: "Wurstel", undercover: "Salsiccia" },
-        { civilian: "Patatine Fritte", undercover: "Chips" },
-        { civilian: "Olio", undercover: "Aceto" },
-        { civilian: "Sale", undercover: "Pepe" },
-        { civilian: "Zucchero", undercover: "Dolcificante" },
-        { civilian: "Spaghetti", undercover: "Rigatoni" },
-        { civilian: "Tortellini", undercover: "Ravioli" },
-        { civilian: "Gambero", undercover: "Scampo" },
-        { civilian: "Limone", undercover: "Lime" },
-        { civilian: "Banana", undercover: "Platano" },
-        { civilian: "Pomodoro", undercover: "Peperone" },
-        { civilian: "Melanzana", undercover: "Peperone" }, 
-        { civilian: "Patata", undercover: "Carota" },
-        { civilian: "Basilico", undercover: "Prezzemolo" },
-        { civilian: "Cioccolato Fondente", undercover: "Cioccolato al Latte" },
-        { civilian: "Pancetta", undercover: "Guanciale" },
-        { civilian: "Crepes", undercover: "Pancake" },
+        // --- CIBO & CUCINA ---
+        { civilian: "Pandoro", undercover: "Panettone", hint: "Dolce" },
+        { civilian: "Tiramisù", undercover: "Profiterole", hint: "Dolce" },
+        { civilian: "Lasagna", undercover: "Cannelloni", hint: "Pasta" },
+        { civilian: "Polpetta", undercover: "Polpettone", hint: "Carne" },
+        { civilian: "Tonno", undercover: "Salmone", hint: "Pesce" },
+        { civilian: "Miele", undercover: "Marmellata", hint: "Spalmabile" },
+        { civilian: "Yogurt", undercover: "Budino", hint: "Cremoso" },
+        { civilian: "Pistacchio", undercover: "Mandorla", hint: "Frutta secca" },
+        { civilian: "Griglia", undercover: "Barbecue", hint: "Cottura" },
+        { civilian: "Prosecco", undercover: "Spritz", hint: "Alcolico" },
+        { civilian: "Mojito", undercover: "Gin Tonic", hint: "Cocktail" },
+        { civilian: "Acqua Naturale", undercover: "Acqua Frizzante", hint: "Bevanda" },
+        { civilian: "Rosmarino", undercover: "Salvia", hint: "Aroma" },
+        { civilian: "Aglio", undercover: "Cipolla", hint: "Soffritto" },
+        { civilian: "Fragola", undercover: "Lampone", hint: "Frutto" },
+        { civilian: "Pera", undercover: "Mela", hint: "Frutto" },
+        { civilian: "Parmigiano", undercover: "Pecorino", hint: "Formaggio" },
+        { civilian: "Cozze", undercover: "Vongole", hint: "Mare" },
+        { civilian: "Wurstel", undercover: "Salsiccia", hint: "Carne" },
+        { civilian: "Patatine Fritte", undercover: "Chips", hint: "Snack" },
+        { civilian: "Olio", undercover: "Aceto", hint: "Condimento" },
+        { civilian: "Sale", undercover: "Pepe", hint: "Condimento" },
+        { civilian: "Zucchero", undercover: "Dolcificante", hint: "Dolcezza" },
+        { civilian: "Spaghetti", undercover: "Rigatoni", hint: "Pasta" },
+        { civilian: "Tortellini", undercover: "Ravioli", hint: "Pasta" },
+        { civilian: "Gambero", undercover: "Scampo", hint: "Crostaceo" },
+        { civilian: "Limone", undercover: "Lime", hint: "Agrume" },
+        { civilian: "Banana", undercover: "Platano", hint: "Frutto" },
+        { civilian: "Pomodoro", undercover: "Peperone", hint: "Ortaggio" },
+        { civilian: "Melanzana", undercover: "Peperone", hint: "Ortaggio" },
+        { civilian: "Patata", undercover: "Carota", hint: "Ortaggio" },
+        { civilian: "Basilico", undercover: "Prezzemolo", hint: "Erba" },
+        { civilian: "Cioccolato Fondente", undercover: "Cioccolato al Latte", hint: "Cioccolato" },
+        { civilian: "Pancetta", undercover: "Guanciale", hint: "Salume" },
+        { civilian: "Crepes", undercover: "Pancake", hint: "Dolce" },
 
-        // --- OGGETTI DI CASA & QUOTIDIANI (NUOVI) ---
-        { civilian: "Cuscino", undercover: "Guanciale" }, 
-        { civilian: "Pettine", undercover: "Spazzola" },
-        { civilian: "Shampoo", undercover: "Bagnoschiuma" },
-        { civilian: "Valigia", undercover: "Zaino" },
-        { civilian: "Ombrello", undercover: "Impermeabile" },
-        { civilian: "Candela", undercover: "Lampadina" },
-        { civilian: "Tappeto", undercover: "Zerbino" },
-        { civilian: "Sedia", undercover: "Sgabello" },
-        { civilian: "Chiave", undercover: "Lucchetto" },
-        { civilian: "Dentifricio", undercover: "Collutorio" },
-        { civilian: "Accendino", undercover: "Fiammifero" },
-        { civilian: "Lavatrice", undercover: "Lavastoviglie" },
-        { civilian: "Scopa", undercover: "Aspirapolvere" },
-        { civilian: "Forbici", undercover: "Tagliaunghie" },
-        { civilian: "Armadio", undercover: "Cassettiera" },
-        { civilian: "Coltello", undercover: "Taglierino" },
-        { civilian: "Piatto", undercover: "Ciotola" },
-        { civilian: "Padella", undercover: "Pentola" },
-        { civilian: "Forno", undercover: "Microonde" },
-        { civilian: "Frigorifero", undercover: "Freezer" },
-        { civilian: "Coperta", undercover: "Piumone" },
-        { civilian: "Lenzuolo", undercover: "Tovaglia" },
-        { civilian: "Tavolo", undercover: "Scrivania" },
-        { civilian: "Sapone", undercover: "Detersivo" },
-        { civilian: "Profumo", undercover: "Deodorante" },
-        { civilian: "Orologio", undercover: "Sveglia" },
-        { civilian: "Borsa", undercover: "Portafoglio" },
-        { civilian: "Gomma", undercover: "Sbianchetto" },
-        { civilian: "Quaderno", undercover: "Diario" },
-        { civilian: "Giornale", undercover: "Fumetto" },
-        { civilian: "Busta", undercover: "Pacco" },
+        // --- OGGETTI DI CASA & QUOTIDIANI ---
+        { civilian: "Cuscino", undercover: "Guanciale", hint: "Letto" },
+        { civilian: "Pettine", undercover: "Spazzola", hint: "Capelli" },
+        { civilian: "Shampoo", undercover: "Bagnoschiuma", hint: "Bagno" },
+        { civilian: "Valigia", undercover: "Zaino", hint: "Viaggio" },
+        { civilian: "Ombrello", undercover: "Impermeabile", hint: "Pioggia" },
+        { civilian: "Candela", undercover: "Lampadina", hint: "Luce" },
+        { civilian: "Tappeto", undercover: "Zerbino", hint: "Pavimento" },
+        { civilian: "Sedia", undercover: "Sgabello", hint: "Seduta" },
+        { civilian: "Chiave", undercover: "Lucchetto", hint: "Sicurezza" },
+        { civilian: "Dentifricio", undercover: "Collutorio", hint: "Denti" },
+        { civilian: "Accendino", undercover: "Fiammifero", hint: "Fuoco" },
+        { civilian: "Lavatrice", undercover: "Lavastoviglie", hint: "Elettrodomestico" },
+        { civilian: "Scopa", undercover: "Aspirapolvere", hint: "Pulizia" },
+        { civilian: "Forbici", undercover: "Tagliaunghie", hint: "Taglio" },
+        { civilian: "Armadio", undercover: "Cassettiera", hint: "Mobile" },
+        { civilian: "Coltello", undercover: "Taglierino", hint: "Utensile" },
+        { civilian: "Piatto", undercover: "Ciotola", hint: "Cucina" },
+        { civilian: "Padella", undercover: "Pentola", hint: "Cucina" },
+        { civilian: "Forno", undercover: "Microonde", hint: "Cucina" },
+        { civilian: "Frigorifero", undercover: "Freezer", hint: "Freddo" },
+        { civilian: "Coperta", undercover: "Piumone", hint: "Letto" },
+        { civilian: "Lenzuolo", undercover: "Tovaglia", hint: "Tessuto" },
+        { civilian: "Tavolo", undercover: "Scrivania", hint: "Mobile" },
+        { civilian: "Sapone", undercover: "Detersivo", hint: "Pulizia" },
+        { civilian: "Profumo", undercover: "Deodorante", hint: "Odore" },
+        { civilian: "Orologio", undercover: "Sveglia", hint: "Tempo" },
+        { civilian: "Borsa", undercover: "Portafoglio", hint: "Accessorio" },
+        { civilian: "Gomma", undercover: "Sbianchetto", hint: "Scrittura" },
+        { civilian: "Quaderno", undercover: "Diario", hint: "Scrittura" },
+        { civilian: "Giornale", undercover: "Fumetto", hint: "Lettura" },
+        { civilian: "Busta", undercover: "Pacco", hint: "Spedizione" },
 
-        // --- ANIMALI (NUOVI) ---
-        { civilian: "Rana", undercover: "Rospo" },
-        { civilian: "Cammello", undercover: "Dromedario" },
-        { civilian: "Polpo", undercover: "Calamaro" },
-        { civilian: "Corvo", undercover: "Merlo" },
-        { civilian: "Vipera", undercover: "Biscia" },
-        { civilian: "Zanzara", undercover: "Mosca" },
-        { civilian: "Mucca", undercover: "Toro" },
-        { civilian: "Panda", undercover: "Orso" },
-        { civilian: "Cigno", undercover: "Oca" },
-        { civilian: "Gorilla", undercover: "Scimmia" },
-        { civilian: "Criceto", undercover: "Cavia" },
-        { civilian: "Formica", undercover: "Termite" },
-        { civilian: "Gallo", undercover: "Gallina" },
-        { civilian: "Squalo", undercover: "Orca" },
-        { civilian: "Topo", undercover: "Ratto" },
-        { civilian: "Coniglio", undercover: "Lepre" },
-        { civilian: "Volpe", undercover: "Lupo" }, 
-        { civilian: "Cervo", undercover: "Alce" },
-        { civilian: "Pappagallo", undercover: "Canarino" },
+        // --- ANIMALI ---
+        { civilian: "Rana", undercover: "Rospo", hint: "Anfibio" },
+        { civilian: "Cammello", undercover: "Dromedario", hint: "Deserto" },
+        { civilian: "Polpo", undercover: "Calamaro", hint: "Mare" },
+        { civilian: "Corvo", undercover: "Merlo", hint: "Uccello" },
+        { civilian: "Vipera", undercover: "Biscia", hint: "Rettile" },
+        { civilian: "Zanzara", undercover: "Mosca", hint: "Insetto" },
+        { civilian: "Mucca", undercover: "Toro", hint: "Fattoria" },
+        { civilian: "Panda", undercover: "Orso", hint: "Mammifero" },
+        { civilian: "Cigno", undercover: "Oca", hint: "Uccello" },
+        { civilian: "Gorilla", undercover: "Scimmia", hint: "Primate" },
+        { civilian: "Criceto", undercover: "Cavia", hint: "Roditore" },
+        { civilian: "Formica", undercover: "Termite", hint: "Insetto" },
+        { civilian: "Gallo", undercover: "Gallina", hint: "Fattoria" },
+        { civilian: "Squalo", undercover: "Orca", hint: "Mare" },
+        { civilian: "Topo", undercover: "Ratto", hint: "Roditore" },
+        { civilian: "Coniglio", undercover: "Lepre", hint: "Roditore" },
+        { civilian: "Volpe", undercover: "Lupo", hint: "Selvatico" },
+        { civilian: "Cervo", undercover: "Alce", hint: "Bosco" },
+        { civilian: "Pappagallo", undercover: "Canarino", hint: "Uccello" },
 
-        // --- LUOGHI & NATURA (NUOVI) ---
-        { civilian: "Ascensore", undercover: "Scale mobili" },
-        { civilian: "Sauna", undercover: "Bagno Turco" },
-        { civilian: "Stadio", undercover: "Arena" },
-        { civilian: "Zoo", undercover: "Circo" },
-        { civilian: "Cantina", undercover: "Soffitta" },
-        { civilian: "Balcone", undercover: "Terrazzo" },
-        { civilian: "Bar", undercover: "Pub" },
-        { civilian: "Farmacia", undercover: "Ospedale" },
-        { civilian: "Discoteca", undercover: "Concerto" },
-        { civilian: "Campeggio", undercover: "Picnic" },
-        { civilian: "Grotta", undercover: "Caverna" },
-        { civilian: "Isola", undercover: "Penisola" },
-        { civilian: "Ponte", undercover: "Viadotto" },
-        { civilian: "Vulcano", undercover: "Cratere" },
-        { civilian: "Cascata", undercover: "Fiume" },
-        { civilian: "Prato", undercover: "Giardino" },
-        { civilian: "Aeroporto", undercover: "Stazione" },
-        { civilian: "Chiesa", undercover: "Cattedrale" },
-        { civilian: "Castello", undercover: "Fortezza" },
+        // --- LUOGHI & NATURA ---
+        { civilian: "Ascensore", undercover: "Scale mobili", hint: "Trasporto" },
+        { civilian: "Sauna", undercover: "Bagno Turco", hint: "Relax" },
+        { civilian: "Stadio", undercover: "Arena", hint: "Sport" },
+        { civilian: "Zoo", undercover: "Circo", hint: "Animali" },
+        { civilian: "Cantina", undercover: "Soffitta", hint: "Stanza" },
+        { civilian: "Balcone", undercover: "Terrazzo", hint: "Esterno" },
+        { civilian: "Bar", undercover: "Pub", hint: "Locale" },
+        { civilian: "Farmacia", undercover: "Ospedale", hint: "Salute" },
+        { civilian: "Discoteca", undercover: "Concerto", hint: "Musica" },
+        { civilian: "Campeggio", undercover: "Picnic", hint: "Aperto" },
+        { civilian: "Grotta", undercover: "Caverna", hint: "Natura" },
+        { civilian: "Isola", undercover: "Penisola", hint: "Terra" },
+        { civilian: "Ponte", undercover: "Viadotto", hint: "Struttura" },
+        { civilian: "Vulcano", undercover: "Cratere", hint: "Fuoco" },
+        { civilian: "Cascata", undercover: "Fiume", hint: "Acqua" },
+        { civilian: "Prato", undercover: "Giardino", hint: "Verde" },
+        { civilian: "Aeroporto", undercover: "Stazione", hint: "Viaggio" },
+        { civilian: "Chiesa", undercover: "Cattedrale", hint: "Religione" },
+        { civilian: "Castello", undercover: "Fortezza", hint: "Edificio" },
 
-        // --- MESTIERI (NUOVI) ---
-        { civilian: "Barbiere", undercover: "Parrucchiere" },
-        { civilian: "Idraulico", undercover: "Elettricista" },
-        { civilian: "Giudice", undercover: "Avvocato" },
-        { civilian: "Pittore", undercover: "Scultore" },
-        { civilian: "Cameriere", undercover: "Barista" },
-        { civilian: "Soldato", undercover: "Poliziotto" },
-        { civilian: "Attore", undercover: "Regista" },
-        { civilian: "Cantante", undercover: "Musicista" },
-        { civilian: "Medico", undercover: "Infermiere" },
-        { civilian: "Dentista", undercover: "Igienista" },
-        { civilian: "Cuoco", undercover: "Pasticcere" },
-        { civilian: "Pilota", undercover: "Autista" },
-        { civilian: "Maestro", undercover: "Professore" },
-        { civilian: "Architetto", undercover: "Ingegnere" },
-        { civilian: "Giornalista", undercover: "Scrittore" },
+        // --- MESTIERI ---
+        { civilian: "Barbiere", undercover: "Parrucchiere", hint: "Capelli" },
+        { civilian: "Idraulico", undercover: "Elettricista", hint: "Tecnico" },
+        { civilian: "Giudice", undercover: "Avvocato", hint: "Legge" },
+        { civilian: "Pittore", undercover: "Scultore", hint: "Arte" },
+        { civilian: "Cameriere", undercover: "Barista", hint: "Servizio" },
+        { civilian: "Soldato", undercover: "Poliziotto", hint: "Divisa" },
+        { civilian: "Attore", undercover: "Regista", hint: "Spettacolo" },
+        { civilian: "Cantante", undercover: "Musicista", hint: "Musica" },
+        { civilian: "Medico", undercover: "Infermiere", hint: "Salute" },
+        { civilian: "Dentista", undercover: "Igienista", hint: "Denti" },
+        { civilian: "Cuoco", undercover: "Pasticcere", hint: "Cucina" },
+        { civilian: "Pilota", undercover: "Autista", hint: "Guida" },
+        { civilian: "Maestro", undercover: "Professore", hint: "Scuola" },
+        { civilian: "Architetto", undercover: "Ingegnere", hint: "Progetto" },
+        { civilian: "Giornalista", undercover: "Scrittore", hint: "Scrittura" },
 
-        // --- ABBIGLIAMENTO (NUOVI) ---
-        { civilian: "Felpa", undercover: "Maglione" },
-        { civilian: "Jeans", undercover: "Pantaloni" },
-        { civilian: "Cappotto", undercover: "Giacca" },
-        { civilian: "Guanti", undercover: "Muffole" },
-        { civilian: "Calzini", undercover: "Calze" },
-        { civilian: "Cintura", undercover: "Bretelle" },
-        { civilian: "Cappello", undercover: "Berretto" },
-        { civilian: "Occhiali da sole", undercover: "Occhiali da vista" },
-        { civilian: "Bikini", undercover: "Costume intero" },
-        { civilian: "Papillon", undercover: "Cravatta" },
-        { civilian: "Gonna", undercover: "Vestito" },
+        // --- ABBIGLIAMENTO ---
+        { civilian: "Felpa", undercover: "Maglione", hint: "Busto" },
+        { civilian: "Jeans", undercover: "Pantaloni", hint: "Gambe" },
+        { civilian: "Cappotto", undercover: "Giacca", hint: "Inverno" },
+        { civilian: "Guanti", undercover: "Muffole", hint: "Mani" },
+        { civilian: "Calzini", undercover: "Calze", hint: "Piedi" },
+        { civilian: "Cintura", undercover: "Bretelle", hint: "Accessorio" },
+        { civilian: "Cappello", undercover: "Berretto", hint: "Testa" },
+        { civilian: "Occhiali da sole", undercover: "Occhiali da vista", hint: "Occhi" },
+        { civilian: "Bikini", undercover: "Costume intero", hint: "Mare" },
+        { civilian: "Papillon", undercover: "Cravatta", hint: "Collo" },
+        { civilian: "Gonna", undercover: "Vestito", hint: "Donna" },
 
-        // --- PERSONAGGI & POP CULTURE (NUOVI) ---
-        { civilian: "Super Mario", undercover: "Luigi" },
-        { civilian: "Barbie", undercover: "Bratz" },
-        { civilian: "Topolino", undercover: "Paperino" },
-        { civilian: "Shrek", undercover: "Fiona" },
-        { civilian: "Yoda", undercover: "Darth Vader" },
-        { civilian: "Homer Simpson", undercover: "Peter Griffin" },
-        { civilian: "Messi", undercover: "Ronaldo" },
-        { civilian: "Ferrari", undercover: "Lamborghini" },
-        { civilian: "Nike", undercover: "Adidas" },
-        { civilian: "Pikachu", undercover: "Charizard" },
-        { civilian: "Gandalf", undercover: "Silente" },
-        { civilian: "Thor", undercover: "Loki" },
-        { civilian: "Spongebob", undercover: "Patrick" },
-        { civilian: "Naruto", undercover: "Goku" },
+        // --- PERSONAGGI & POP CULTURE ---
+        { civilian: "Super Mario", undercover: "Luigi", hint: "Videogioco" },
+        { civilian: "Barbie", undercover: "Bratz", hint: "Bambola" },
+        { civilian: "Topolino", undercover: "Paperino", hint: "Disney" },
+        { civilian: "Shrek", undercover: "Fiona", hint: "Orco" },
+        { civilian: "Yoda", undercover: "Darth Vader", hint: "Film" },
+        { civilian: "Homer Simpson", undercover: "Peter Griffin", hint: "Cartone" },
+        { civilian: "Messi", undercover: "Ronaldo", hint: "Calcio" },
+        { civilian: "Ferrari", undercover: "Lamborghini", hint: "Auto" },
+        { civilian: "Nike", undercover: "Adidas", hint: "Sport" },
+        { civilian: "Pikachu", undercover: "Charizard", hint: "Anime" },
+        { civilian: "Gandalf", undercover: "Silente", hint: "Mago" },
+        { civilian: "Thor", undercover: "Loki", hint: "Supereroe" },
+        { civilian: "Spongebob", undercover: "Patrick", hint: "Cartone" },
+        { civilian: "Naruto", undercover: "Goku", hint: "Anime" },
 
-        // --- CONCETTI ASTRATTI (NUOVI) ---
-        { civilian: "Bugia", undercover: "Segreto" },
-        { civilian: "Paura", undercover: "Ansia" },
-        { civilian: "Fortuna", undercover: "Destino" },
-        { civilian: "Talento", undercover: "Genio" },
-        { civilian: "Rumore", undercover: "Suono" },
-        { civilian: "Caldo", undercover: "Afoso" },
-        { civilian: "Veloce", undercover: "Rapido" },
-        { civilian: "Ricco", undercover: "Benestante" },
-        { civilian: "Guerra", undercover: "Battaglia" },
-        { civilian: "Passato", undercover: "Futuro" },
-        { civilian: "Vittoria", undercover: "Trionfo" },
-        { civilian: "Errore", undercover: "Sbaglio" }
+        // --- CONCETTI ASTRATTI ---
+        { civilian: "Bugia", undercover: "Segreto", hint: "Verità" },
+        { civilian: "Paura", undercover: "Ansia", hint: "Emozione" },
+        { civilian: "Fortuna", undercover: "Destino", hint: "Caso" },
+        { civilian: "Talento", undercover: "Genio", hint: "Abilità" },
+        { civilian: "Rumore", undercover: "Suono", hint: "Udito" },
+        { civilian: "Caldo", undercover: "Afoso", hint: "Temperatura" },
+        { civilian: "Veloce", undercover: "Rapido", hint: "Velocità" },
+        { civilian: "Ricco", undercover: "Benestante", hint: "Soldi" },
+        { civilian: "Guerra", undercover: "Battaglia", hint: "Conflitto" },
+        { civilian: "Passato", undercover: "Futuro", hint: "Tempo" },
+        { civilian: "Vittoria", undercover: "Trionfo", hint: "Successo" },
+        { civilian: "Errore", undercover: "Sbaglio", hint: "Sbaglio" }
       ];
 
       // ==========================================
@@ -461,13 +461,54 @@
         );
       };
 
+      // --- Guess Result Overlay ---
+      const GuessResultOverlay = ({ result, onClose }) => {
+        if (!result) return null;
+
+        return (
+          <div className={`fixed inset-0 z-[60] flex flex-col items-center justify-center p-6 animate-fadeIn ${
+            result.isCorrect ? 'bg-green-600/95' : 'bg-red-600/95'
+          } backdrop-blur-lg`}>
+            <div className="text-center space-y-6 max-w-lg">
+              <div className="flex justify-center mb-6">
+                {result.isCorrect ? (
+                  <Trophy size={80} className="text-yellow-300 drop-shadow-lg animate-bounce" />
+                ) : (
+                  <X size={80} className="text-white drop-shadow-lg" />
+                )}
+              </div>
+              
+              <h2 className="font-display text-5xl md:text-7xl font-black text-white drop-shadow-xl tracking-wider">
+                {result.isCorrect ? "INDOVINATO!" : "SBAGLIATO!"}
+              </h2>
+              
+              {!result.isCorrect && (
+                <div className="bg-black/30 p-6 rounded-3xl border border-white/20 backdrop-blur-md">
+                  <p className="text-white/80 uppercase text-sm font-bold tracking-widest mb-2">La parola era</p>
+                  <p className="font-display text-3xl md:text-5xl font-bold text-white tracking-wide">
+                    {result.correctWord}
+                  </p>
+                </div>
+              )}
+
+              <Button 
+                onClick={onClose}
+                className="mt-10 bg-white text-black hover:bg-gray-100 shadow-xl border-none py-4 text-xl"
+              >
+                CONTINUA
+              </Button>
+            </div>
+          </div>
+        );
+      };
+
       // --- Settings Modal ---
-      const SettingsModal = ({ isOpen, onClose, isDarkMode, toggleTheme, audioSettings, setAudioSettings }) => {
+      const SettingsModal = ({ isOpen, onClose, isDarkMode, toggleTheme, audioSettings, setAudioSettings, settings, setSettings }) => {
         if (!isOpen) return null;
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div className="glass-panel w-full max-w-sm rounded-3xl p-6 relative shadow-2xl">
+            <div className="glass-panel w-full max-w-sm rounded-3xl p-6 relative shadow-2xl overflow-y-auto max-h-[90vh]">
               <button 
                 onClick={onClose}
                 className="absolute top-4 right-4 text-theme-muted hover:text-theme-main transition-colors"
@@ -562,7 +603,7 @@
       };
 
       // --- SetupScreen ---
-      const SetupScreen = ({ onStartGame, isDarkMode }) => {
+      const SetupScreen = ({ onStartGame, isDarkMode, settings, setSettings }) => {
         const [players, setPlayers] = useState(() => {
             const saved = localStorage.getItem(STORAGE_KEY_PLAYERS);
             return saved ? JSON.parse(saved) : [];
@@ -570,31 +611,12 @@
 
         const [inputValue, setInputValue] = useState('');
 
-        const [settings, setSettings] = useState(() => {
-            const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                if (typeof parsed.mrWhiteCount === 'undefined') parsed.mrWhiteCount = 1;
-                return parsed;
-            }
-            return {
-                mrWhiteCount: 1,
-                undercoverCount: 1,
-                timerEnabled: true,
-                timerDuration: 60
-            };
-        });
-
         const [activeTab, setActiveTab] = useState('setup');
         const [leaderboard, setLeaderboard] = useState([]);
 
         useEffect(() => {
           setLeaderboard(getLeaderboard());
         }, [activeTab]);
-
-        useEffect(() => {
-            localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
-        }, [settings]);
 
         useEffect(() => {
             localStorage.setItem(STORAGE_KEY_PLAYERS, JSON.stringify(players));
@@ -761,24 +783,43 @@
                         <Settings size={18} className="text-neon-pink" /> Ruoli
                       </h3>
 
-                      {/* Mister White Counter */}
-                      <div className="flex items-center justify-between p-2 theme-item rounded-2xl transition-colors">
-                        <div className="flex items-center gap-5">
-                          <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.mrWhiteCount > 0 ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-110' : 'theme-item text-gray-500'}`}>
-                            <HelpCircle size={28} />
-                          </div>
-                          <div>
-                            <h3 className={`font-bold text-xl transition-colors ${settings.mrWhiteCount > 0 ? 'text-theme-main' : 'text-theme-muted'}`}>Mister White</h3>
-                            <p className="text-sm text-theme-muted mt-1">Non conosce la parola</p>
-                          </div>
+                      {/* Mister White Counter & Hint Toggle */}
+                      <div className="p-2 theme-item rounded-2xl transition-colors">
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-5">
+                              <div className={`p-4 rounded-2xl transition-all duration-300 ${settings.mrWhiteCount > 0 ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-110' : 'theme-item text-gray-500'}`}>
+                                <HelpCircle size={28} />
+                              </div>
+                              <div>
+                                <h3 className={`font-bold text-xl transition-colors ${settings.mrWhiteCount > 0 ? 'text-theme-main' : 'text-theme-muted'}`}>Mister White</h3>
+                                <p className="text-sm text-theme-muted mt-1">Non conosce la parola</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4 theme-input rounded-2xl p-2">
+                               <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main disabled:opacity-30 transition-colors" 
+                                disabled={settings.mrWhiteCount === 0}
+                                onClick={() => setSettings(s => ({...s, mrWhiteCount: Math.max(0, s.mrWhiteCount - 1)}))}>-</button>
+                               <span className="font-display font-bold w-8 text-center text-theme-main text-2xl">{settings.mrWhiteCount}</span>
+                               <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main transition-colors"
+                                onClick={() => setSettings(s => ({...s, mrWhiteCount: s.mrWhiteCount + 1}))}>+</button>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-4 theme-input rounded-2xl p-2">
-                           <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main disabled:opacity-30 transition-colors" 
-                            disabled={settings.mrWhiteCount === 0}
-                            onClick={() => setSettings(s => ({...s, mrWhiteCount: Math.max(0, s.mrWhiteCount - 1)}))}>-</button>
-                           <span className="font-display font-bold w-8 text-center text-theme-main text-2xl">{settings.mrWhiteCount}</span>
-                           <button className="w-12 h-12 flex items-center justify-center theme-item rounded-xl hover:bg-white/20 text-theme-main transition-colors"
-                            onClick={() => setSettings(s => ({...s, mrWhiteCount: s.mrWhiteCount + 1}))}>+</button>
+                        
+                        {/* HINT TOGGLE - SPOSTATO QUI */}
+                        <div className="flex items-center justify-between px-2 pb-1 pt-2 border-t border-white/5">
+                            <span className="text-xs text-theme-muted flex items-center gap-2 font-bold uppercase tracking-wider">
+                                <Lightbulb size={16} className={settings.mrWhiteHintEnabled ? "text-yellow-400" : "text-gray-500"} />
+                                Abilita indizio
+                            </span>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input 
+                                  type="checkbox" 
+                                  checked={settings.mrWhiteHintEnabled} 
+                                  onChange={(e) => setSettings({...settings, mrWhiteHintEnabled: e.target.checked})} 
+                                  className="sr-only peer" 
+                                />
+                                <div className="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-yellow-400"></div>
+                            </label>
                         </div>
                       </div>
 
@@ -906,7 +947,7 @@
       };
 
       // --- PassScreen ---
-      const PassScreen = ({ player, onNext }) => {
+      const PassScreen = ({ player, onNext, settings }) => {
         const [isFlipped, setIsFlipped] = useState(false);
         const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -986,6 +1027,12 @@
                       <p className="font-display text-4xl md:text-5xl font-black tracking-wider break-words text-white drop-shadow-lg">
                         {player.role === Role.MR_WHITE ? "???" : player.word}
                       </p>
+                      {player.role === Role.MR_WHITE && settings.mrWhiteHintEnabled && player.hint && (
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                          <p className="text-xs text-yellow-400 uppercase font-bold tracking-widest mb-1">Indizio</p>
+                          <p className="text-lg text-white font-medium italic">"{player.hint}"</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-auto flex flex-col items-center text-gray-400">
@@ -1166,17 +1213,29 @@
         const [gameStatus, setGameStatus] = useState('playing');
         const [winners, setWinners] = useState(null);
         const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+        const [guessResult, setGuessResult] = useState(null);
+        
         const [isDarkMode, setIsDarkMode] = useState(() => {
           const saved = localStorage.getItem(STORAGE_KEY_THEME);
           return saved ? JSON.parse(saved) : true;
         });
         
-        const [currentSettings, setCurrentSettings] = useState({
-          mrWhiteCount: 1,
-          undercoverCount: 1,
-          timerEnabled: true,
-          timerDuration: 60
+        // --- 1. SETTINGS LOADING ---
+        const [currentSettings, setCurrentSettings] = useState(() => {
+          const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
+          return saved ? JSON.parse(saved) : {
+            mrWhiteCount: 1,
+            undercoverCount: 1,
+            timerEnabled: true,
+            timerDuration: 60,
+            mrWhiteHintEnabled: false
+          };
         });
+
+        // --- 2. SETTINGS SAVING ---
+        useEffect(() => {
+            localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(currentSettings));
+        }, [currentSettings]);
 
         // --- AUDIO STATE ---
         const audioRef = useRef(null);
@@ -1215,30 +1274,22 @@
         const startGame = (names, settings) => {
           setCurrentSettings(settings);
 
-          let originalPair = getNewWordPair();
+          let pair = getNewWordPair();
 
-          if (!originalPair) {
+          if (!pair) {
             const shouldReset = window.confirm(
               "🎉 Complimenti! Hai giocato tutte le parole disponibili nel database!\n\nVuoi resettare la memoria e ricominciare da capo con le stesse parole?"
             );
 
             if (shouldReset) {
               resetUsedWordsHistory();
-              originalPair = getNewWordPair();
+              pair = getNewWordPair();
             } else {
               return; 
             }
           }
 
-          if (!originalPair) return;
-
-          let pair = { ...originalPair };
-          if (Math.random() < 0.5) {
-             pair = {
-               civilian: originalPair.undercover,
-               undercover: originalPair.civilian
-             };
-          }
+          if (!pair) return;
 
           setCivilianWord(pair.civilian);
 
@@ -1255,6 +1306,7 @@
             name: name,
             role: roles[i],
             word: roles[i] === Role.CIVILIAN ? pair.civilian : (roles[i] === Role.UNDERCOVER ? pair.undercover : undefined),
+            hint: pair.hint, 
             isAlive: true,
             isStarter: false
           }));
@@ -1291,19 +1343,32 @@
             setTimeout(() => {
               const guess = prompt(`Mister White (${eliminatedPlayer.name}) è stato scoperto! Ha una chance per vincere.\n\nQual è la parola segreta dei Civili?`);
               
-              if (guess && guess.toLowerCase().trim() === civilianWord.toLowerCase().trim()) {
-                 handleGameOver('Mr. White', [eliminatedPlayer.name]);
-                 return;
-              } else {
-                 alert("Sbagliato! La parola era: " + civilianWord);
-                 checkWinCondition(updatedPlayers);
-              }
+              const isCorrect = guess && guess.toLowerCase().trim() === civilianWord.toLowerCase().trim();
+              
+              setGuessResult({
+                isCorrect: isCorrect,
+                correctWord: civilianWord,
+                player: eliminatedPlayer,
+                updatedPlayers: updatedPlayers
+              });
+              
             }, 100);
           } else {
             checkWinCondition(updatedPlayers);
           }
           
           setGameStatus('playing');
+        };
+
+        const closeGuessResult = () => {
+          const result = guessResult;
+          setGuessResult(null);
+          
+          if (result.isCorrect) {
+             handleGameOver('Mr. White', [result.player.name]);
+          } else {
+             checkWinCondition(result.updatedPlayers);
+          }
         };
 
         const checkWinCondition = (currentPlayers) => {
@@ -1356,7 +1421,7 @@
           triggerConfetti();
           
           let icon = <Trophy size={80} className="text-yellow-400" />;
-          if (winningTeam === 'Impostori') icon = <div className="text-7xl">👺</div>;
+          if (winningTeam === 'Impostori' || winningTeam === 'Mr. White') icon = <div className="text-7xl">👺</div>;
           
           setWinners({ team: winningTeam, icon });
           updateLeaderboard(winnerNames, players.map(p => p.name));
@@ -1387,13 +1452,18 @@
               toggleTheme={toggleTheme}
               audioSettings={audioSettings}
               setAudioSettings={setAudioSettings}
+              settings={currentSettings}
+              setSettings={setCurrentSettings}
             />
+
+            {/* Mr White Guess Result Overlay */}
+            <GuessResultOverlay result={guessResult} onClose={closeGuessResult} />
 
             <div className="relative z-10 w-full h-full flex-1 flex flex-col max-w-7xl mx-auto">
               
               {phase === GamePhase.SETUP && (
                 <div className="flex-1 flex items-center justify-center p-4">
-                   <SetupScreen onStartGame={startGame} isDarkMode={isDarkMode} />
+                   <SetupScreen onStartGame={startGame} isDarkMode={isDarkMode} settings={currentSettings} setSettings={setCurrentSettings} />
                 </div>
               )}
 
@@ -1402,7 +1472,7 @@
                    <PassScreen 
                     player={players[turnIndex]} 
                     onNext={handleNextPlayer} 
-                    civilianWord={civilianWord}
+                    settings={currentSettings}
                   />
                  </div>
               )}
